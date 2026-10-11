@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import Window from '@/app/components/Window'
 import {
   AMPHETAMINE_PK, AMPHETAMINE_ZONES, AMPHETAMINE_INTERACTIONS,
   simulateAmphetamine, calcAmphetamineMetrics,
@@ -96,7 +97,7 @@ export default function AmphetaminesCalculator() {
     const maxT    = ts
 
     ctx.clearRect(0, 0, W, H)
-    ctx.fillStyle = 'white'
+    ctx.fillStyle = '#11141f'
     ctx.fillRect(0, 0, W, H)
 
     const xS = t => pad.left + (Math.min(t, maxT) / maxT) * cW
@@ -113,14 +114,14 @@ export default function AmphetaminesCalculator() {
       const midY = (Math.max(y0, pad.top) + Math.min(y1, pad.top + cH)) / 2
       if (Math.min(y1, pad.top + cH) - Math.max(y0, pad.top) > 14) {
         ctx.fillStyle = zone.color; ctx.globalAlpha = 0.75
-        ctx.font = '9px sans-serif'; ctx.textAlign = 'right'
+        ctx.font = '9px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'right'
         ctx.fillText(zone.label, pad.left + cW - 3, midY + 3)
         ctx.globalAlpha = 1
       }
     })
 
     // Grid
-    ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.lineWidth = 1
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1
     const yStep  = dispMax <= 200 ? 50 : 100
     const yLines = Array.from({ length: Math.floor(dispMax / yStep) + 1 }, (_, i) => i * yStep).filter(v => v <= dispMax)
     yLines.forEach(v => {
@@ -133,7 +134,7 @@ export default function AmphetaminesCalculator() {
     }
 
     // Axis labels
-    ctx.fillStyle = '#374151'; ctx.font = '11px sans-serif'
+    ctx.fillStyle = '#9aa1bf'; ctx.font = '11px Tahoma, Verdana, sans-serif'
     ctx.textAlign = 'right'
     yLines.forEach(v => ctx.fillText(v + ' ng/mL', pad.left - 4, yS(v) + 4))
     ctx.textAlign = 'center'
@@ -143,26 +144,26 @@ export default function AmphetaminesCalculator() {
     ctx.save()
     ctx.translate(12, pad.top + cH / 2)
     ctx.rotate(-Math.PI / 2)
-    ctx.textAlign = 'center'; ctx.font = '10px sans-serif'; ctx.fillStyle = '#9ca3af'
+    ctx.textAlign = 'center'; ctx.font = '10px Tahoma, Verdana, sans-serif'; ctx.fillStyle = '#9ca3af'
     ctx.fillText('Plasma (ng/mL)', 0, 0)
     ctx.restore()
-    ctx.textAlign = 'center'; ctx.fillStyle = '#374151'; ctx.font = '11px sans-serif'
+    ctx.textAlign = 'center'; ctx.fillStyle = '#9aa1bf'; ctx.font = '11px Tahoma, Verdana, sans-serif'
     ctx.fillText('Time after first dose (h)', pad.left + cW / 2, H - 8)
-    ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1
+    ctx.strokeStyle = '#4a5274'; ctx.lineWidth = 1
     ctx.strokeRect(pad.left, pad.top, cW, cH)
 
     // 8h / 24h / 48h reference lines
     const refLines = [
         [8,  'bedtime?', 'rgba(240,244,255,0.4)'],
         [24, '24h later', 'rgba(240,244,255,0.25)'],
-        [48, '48h',      '#d1d5db'],
+        [48, '48h',      '#4a5274'],
     ]
     refLines.forEach(([t, label, color]) => {
         if (t > maxT) return
         ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.setLineDash([2, 4])
         ctx.beginPath(); ctx.moveTo(xS(t), pad.top); ctx.lineTo(xS(t), pad.top + cH); ctx.stroke()
         ctx.setLineDash([])
-        ctx.fillStyle = color; ctx.font = '9px sans-serif'; ctx.textAlign = 'center'
+        ctx.fillStyle = color; ctx.font = '9px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'
         ctx.fillText(label, xS(t), pad.top + cH - 6)
     })
 
@@ -175,7 +176,7 @@ export default function AmphetaminesCalculator() {
       acidFiltered.forEach((p, i) => i === 0 ? ctx.moveTo(xS(p.t), yS(p.c)) : ctx.lineTo(xS(p.t), yS(p.c)))
       ctx.stroke()
       ctx.setLineDash([]); ctx.globalAlpha = 1
-      ctx.fillStyle = '#3b82f6'; ctx.font = '9px sans-serif'; ctx.textAlign = 'left'
+      ctx.fillStyle = '#3b82f6'; ctx.font = '9px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'left'
       ctx.fillText('With vitamin C', xS(1) + 4, yS(acidPts[Math.floor(acidPts.length * 0.15)]?.c ?? 0) - 6)
     }
 
@@ -188,9 +189,9 @@ export default function AmphetaminesCalculator() {
         ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + cH); ctx.stroke()
         ctx.setLineDash([])
       }
-      ctx.font = '12px sans-serif'; ctx.textAlign = 'center'
+      ctx.font = '12px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'
       ctx.fillText('💊', x, pad.top + cH + 40)
-      ctx.fillStyle = '#6b7280'; ctx.font = '9px sans-serif'
+      ctx.fillStyle = '#6b7280'; ctx.font = '9px Tahoma, Verdana, sans-serif'
       ctx.fillText(d.timeh === 0 ? 't=0' : '+' + d.timeh + 'h', x, pad.top + cH + 50)
     })
 
@@ -205,7 +206,7 @@ export default function AmphetaminesCalculator() {
     if (m && m.tmax <= maxT) {
       ctx.fillStyle = cpk.color
       ctx.beginPath(); ctx.arc(xS(m.tmax), yS(m.cmax), 5, 0, Math.PI * 2); ctx.fill()
-      ctx.fillStyle = '#111827'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'
+      ctx.fillStyle = '#e8ebf7'; ctx.font = 'bold 11px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'
       ctx.fillText('Peak ' + m.cmax + ' ng/mL', xS(m.tmax), yS(m.cmax) - 10)
     }
   }
@@ -232,27 +233,25 @@ export default function AmphetaminesCalculator() {
   }
 
   const btn = (active, color = '#f97316') => ({
-    padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px',
+    padding: '6px 14px', borderRadius: '3px', cursor: 'pointer', fontSize: '14.5px',
     fontWeight: active ? '600' : '400',
-    border: active ? `2px solid ${color}` : '1px solid #d1d5db',
+    border: active ? `2px solid ${color}` : '1px solid var(--xp-etch)',
     background: active ? color + '18' : 'rgba(255,255,255,0.05)',
     color: active ? color : 'rgba(240,244,255,0.65)',
   })
 
   return (
-    <main style={{ maxWidth: '980px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; } select option { background:#0f1629; }`}</style>
-      <a href="/harm-reduction" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none', color: 'rgba(240,244,255,0.4)' }}>← Harm reduction</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px' }}>Amphetamine Pharmacokinetics</h1>
-      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
+    <main className="xp-desktop">
+      <Window title="Amphetamine pharmacokinetics" icon="substance:amphetamines" closeHref="/harm-reduction" status={['Oral model with pH-dependent elimination', 'Runs on your device. Nothing you enter is sent anywhere.']}>
+      <p className="xp-intro">
         The long half-life (~10–11h) is the central harm reduction message. Set the time axis to 36h and see exactly what is still in your system the next morning, afternoon, and evening.
       </p>
 
-      <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '10px', padding: '10px 14px', marginBottom: '12px', fontSize: '12px', color: '#fdba74' }}>
+      <div className="xp-alert xp-alert-warn" style={{ marginBottom: '12px', fontSize: '13.5px' }}>
         ⚠ <strong>Test your substance.</strong> Speed sold in Europe varies enormously in purity (often 5–30% amphetamine sulfate). Cutting agents include caffeine, paracetamol, and increasingly cathinones. Reagent test kits confirm amphetamine presence.
       </div>
 
-      <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '10px', padding: '10px 14px', marginBottom: '1.5rem', fontSize: '12px', color: '#fdba74' }}>
+      <div className="xp-alert xp-alert-warn" style={{ marginBottom: '1.5rem', fontSize: '13.5px' }}>
         Population-average PK. Amphetamine elimination is pH-dependent — individual diet, kidney function, and urinary pH all affect duration substantially.
       </div>
 
@@ -262,71 +261,71 @@ export default function AmphetaminesCalculator() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {/* Compound + personal */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Compound</p>
+          <div className="xp-group">
+            <p className="xp-legend">Compound</p>
 
             <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
-              <button onClick={() => setCompound('amphetamine')}     style={btn(compound === 'amphetamine',     '#f97316')}>⚡ Amphetamine (Speed)</button>
-              <button onClick={() => setCompound('methamphetamine')} style={btn(compound === 'methamphetamine', '#dc2626')}>🔴 Methamphetamine (Crystal)</button>
+              <button onClick={() => setCompound('amphetamine')}     style={btn(compound === 'amphetamine',     '#f97316')} aria-pressed={Boolean(compound === 'amphetamine')}>⚡ Amphetamine (Speed)</button>
+              <button onClick={() => setCompound('methamphetamine')} style={btn(compound === 'methamphetamine', '#dc2626')} aria-pressed={Boolean(compound === 'methamphetamine')}>🔴 Methamphetamine (Crystal)</button>
             </div>
 
             {compound === 'methamphetamine' && (
-              <div style={{ marginBottom: '12px', padding: '8px 10px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)', borderRadius: '8px', fontSize: '11px', color: '#fca5a5' }}>
+              <div className="xp-alert xp-alert-error" style={{ marginBottom: '12px', fontSize: '12.5px' }}>
                 Methamphetamine has similar PK to amphetamine but substantially greater CNS potency — more dopamine release per unit plasma concentration. The effect zones are scaled accordingly. Neurotoxicity risk with repeated use is significantly higher.
               </div>
             )}
 
-            <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
+            <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <input type="number" value={rawWeight} min={40} max={150}
                 onChange={e => { setRawWeight(e.target.value); const n = parseFloat(e.target.value); if (n >= 40 && n <= 150) setWeightKg(n) }}
                 onBlur={() => { const n = parseFloat(rawWeight); if (isNaN(n) || n < 40 || n > 150) { setWeightKg(70); setRawWeight('70') } }}
-                style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: '#0f1629' }} />
-              <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>kg</span>
+                style={{ width: '60px', padding: '4px 8px', borderRadius: '2px', border: '1px solid var(--xp-etch)', fontSize: '15.5px', fontWeight: '600', color: 'var(--xp-text)', textAlign: 'right', background: 'var(--xp-face-2)' }} />
+              <span style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)' }}>kg</span>
               <input type="range" min={40} max={150} step={1} value={weightKg}
                 onChange={e => { setWeightKg(parseInt(e.target.value)); setRawWeight(e.target.value) }}
                 style={{ flex: 1, accentColor: pk.color }} />
             </div>
 
             {/* Vitamin C toggle */}
-            <div style={{ padding: '10px 12px', background: 'rgba(42,111,219,0.12)', border: '1px solid rgba(42,111,219,0.35)', borderRadius: '8px' }}>
+            <div className="xp-alert xp-alert-info">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                 <input type="checkbox" id="acidic-check" checked={acidicUrine}
                   onChange={e => setAcidicUrine(e.target.checked)}
-                  style={{ accentColor: '#2563eb', width: '14px', height: '14px' }} />
-                <label htmlFor="acidic-check" style={{ fontSize: '12px', color: '#1e40af', cursor: 'pointer', fontWeight: '500' }}>
+                  style={{ accentColor: '#2fb34a', width: '14px', height: '14px' }} />
+                <label htmlFor="acidic-check" style={{ fontSize: '13.5px', color: '#1e40af', cursor: 'pointer', fontWeight: '500' }}>
                   Show vitamin C (acidified urine) comparison
                 </label>
               </div>
-              <p style={{ fontSize: '11px', color: '#3b82f6', margin: 0 }}>
+              <p style={{ fontSize: '12.5px', color: '#3b82f6', margin: 0 }}>
                 Vitamin C acidifies urine and speeds amphetamine elimination by ~50% (methamphetamine elimination by ~20%). The blue dashed line shows the curve with vitamin C supplementation. This is a documented harm reduction strategy — it does not eliminate risk but reduces duration.
               </p>
             </div>
           </div>
 
           {/* Dose schedule */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dose schedule</p>
+          <div className="xp-group">
+            <p className="xp-legend">Dose schedule</p>
 
             {doses.map((d, idx) => (
-              <div key={d.id} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
+              <div key={d.id} style={{ background: 'var(--xp-face-2)', border: '1px solid var(--xp-etch)', borderRadius: '3px', padding: '10px 12px', marginBottom: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>
+                  <span style={{ fontSize: '13.5px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>
                     {idx === 0 ? 'First dose' : `Dose ${idx + 1}`}
                   </span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)' }}>{d.doseMg}mg</span>
+                    <span style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)' }}>{d.doseMg}mg</span>
                     {doses.length > 1 && (
                       <button onClick={() => removeDose(d.id)}
-                        style={{ fontSize: '18px', color: 'rgba(240,244,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
+                        style={{ fontSize: '18px', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
                     )}
                   </div>
                 </div>
 
                 <div style={{ marginBottom: idx === 0 ? 0 : '8px' }}>
-                  <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
+                  <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>
                     Amount: {d.doseMg}mg
-                    <span style={{ color: 'rgba(240,244,255,0.3)', marginLeft: '4px' }}>
+                    <span style={{ color: 'var(--xp-text-dim)', marginLeft: '4px' }}>
                       {compound === 'amphetamine'
                         ? '(pure amphetamine — street speed ~5-30% purity)'
                         : '(pure methamphetamine)'}
@@ -335,20 +334,20 @@ export default function AmphetaminesCalculator() {
                   <input type="range" min={10} max={200} step={5} value={d.doseMg}
                     onChange={e => updateDose(d.id, 'doseMg', parseInt(e.target.value))}
                     style={{ width: '100%', accentColor: pk.color }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', color: '#6d7494' }}>
                     <span>10mg</span><span>200mg</span>
                   </div>
                 </div>
 
                 {idx > 0 && (
                   <div>
-                    <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
+                    <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>
                       Time: +{d.timeh}h after first dose
                     </label>
                     <input type="range" min={0.5} max={24} step={0.5} value={d.timeh}
                       onChange={e => updateDose(d.id, 'timeh', parseFloat(e.target.value))}
                       style={{ width: '100%', accentColor: pk.color }} />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', color: '#6d7494' }}>
                       <span>+0.5h</span><span>+24h</span>
                     </div>
                   </div>
@@ -357,13 +356,13 @@ export default function AmphetaminesCalculator() {
             ))}
 
             <button onClick={addDose}
-              style={{ width: '100%', padding: '8px', border: `1px dashed ${pk.color}66`, borderRadius: '8px', background: 'transparent', fontSize: '13px', color: pk.color, cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '8px', border: `1px dashed ${pk.color}66`, borderRadius: '3px', background: 'transparent', fontSize: '14.5px', color: pk.color, cursor: 'pointer' }}>
               + Add another dose
             </button>
 
-            <div style={{ marginTop: '10px', padding: '8px 12px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', fontSize: '12px', color: 'rgba(240,244,255,0.75)' }}>
+            <div className="xp-group" style={{ marginTop: '10px', fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', padding: '12px 14px' }}>
               Total: <strong>{totalDose}mg</strong>
-              <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginLeft: '6px' }}>
+              <span style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', marginLeft: '6px' }}>
                 ({(totalDose / weightKg).toFixed(2)} mg/kg)
               </span>
             </div>
@@ -376,18 +375,18 @@ export default function AmphetaminesCalculator() {
           {/* Canvas */}
           <div style={{ position: 'relative', width: '100%', height: '360px' }}>
             <canvas ref={canvasRef}
-              style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: '#0f1629' }} />
+              className="xp-well" style={{ width: '100%', height: '100%' }} />
           </div>
 
           {/* Graph controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: 'rgba(240,244,255,0.3)', whiteSpace: 'nowrap' }}>SHOW</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13.5px' }}>
+            <span style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--xp-text-dim)', whiteSpace: 'nowrap' }}>SHOW</span>
             <input type="range" min={8} max={72} step={4} value={timeScale}
               onChange={e => setTimeScale(parseInt(e.target.value))}
               style={{ flex: 1, accentColor: pk.color }} />
             <span style={{ fontWeight: '600', color: 'rgba(240,244,255,0.75)', minWidth: '28px' }}>{timeScale}h</span>
             <button onClick={exportGraph}
-              style={{ padding: '5px 12px', background: '#2a6fdb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              style={{ padding: '5px 12px', fontSize: '12.5px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               ↓ Export PNG
             </button>
           </div>
@@ -395,7 +394,7 @@ export default function AmphetaminesCalculator() {
           {/* Zone legend */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
             {zones.slice(0, 5).map(z => (
-              <span key={z.label} style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '999px', background: z.color + '22', color: z.color, border: `1px solid ${z.color}44` }}>
+              <span key={z.label} style={{ fontSize: '11.5px', padding: '2px 8px', borderRadius: '2px', background: z.color + '22', color: z.color, border: `1px solid ${z.color}44` }}>
                 {z.min}–{z.max === 99999 ? '+' : z.max} {z.label}
               </span>
             ))}
@@ -410,22 +409,22 @@ export default function AmphetaminesCalculator() {
                 { label: 'Sub-threshold at',    value: metrics.clearTime != null ? formatHours(metrics.clearTime) : '>72h', sub: `below ${AMPHETAMINE_ZONES[compound][0].max} ng/mL` },
                 { label: 'Half-life',            value: pk.thalf + 'h', sub: acidicUrine ? `~${(pk.thalf * (compound === 'amphetamine' ? 0.67 : 0.83)).toFixed(1)}h with vitamin C` : 'population mean' },
               ].map(m => (
-                <div key={m.label} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
-                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '2px' }}>{m.label}</div>
+                <div key={m.label} style={{ background: 'var(--xp-face-2)', border: '1px solid var(--xp-etch)', borderRadius: '3px', padding: '10px 12px' }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', marginBottom: '2px' }}>{m.label}</div>
                   <div style={{ fontSize: '17px', fontWeight: '700', color: m.color ?? '#f0f4ff' }}>{m.value}</div>
-                  {m.sub && <div style={{ fontSize: '10px', color: m.color ?? 'rgba(240,244,255,0.35)' }}>{m.sub}</div>}
+                  {m.sub && <div style={{ fontSize: '11.5px', color: m.color ?? 'rgba(240,244,255,0.35)' }}>{m.sub}</div>}
                 </div>
               ))}
             </div>
           )}
 
           {/* Sleep deprivation warning */}
-          <div style={{ background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.35)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#fde047' }}>
+          <div className="xp-alert xp-alert-warn" style={{ fontSize: '13.5px' }}>
             <strong>The next morning problem:</strong> With t½ ~{pk.thalf}h, a dose taken at 10pm Saturday still has {Math.round(100 * Math.pow(0.5, 10/pk.thalf))}% of its peak concentration at 8am Sunday and {Math.round(100 * Math.pow(0.5, 22/pk.thalf))}% at 8am Monday. Set the time axis to 48h and take a dose at t=0 to see exactly what is in your system when Monday morning lectures start.
           </div>
 
           {/* PK education */}
-          <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#fdba74' }}>
+          <div className="xp-alert xp-alert-warn" style={{ fontSize: '13.5px' }}>
             <p style={{ margin: '0 0 6px' }}>
               <strong>pH-dependent elimination:</strong> Amphetamine is a weak base (pKa 9.9). In acidic urine, more is in the ionised form and cannot be reabsorbed — elimination rate increases substantially. Vitamin C (ascorbic acid) acidifies urine and can reduce t½ by ~30–50%. Alkaline urine (baking soda, antacids) does the opposite — extending duration and increasing plasma levels. The blue dashed curve shows the vitamin C effect.
             </p>
@@ -435,25 +434,26 @@ export default function AmphetaminesCalculator() {
           </div>
 
           {/* Interactions */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 10px' }}>Dangerous combinations</p>
+          <div className="xp-group" style={{ padding: '12px 14px' }}>
+            <p style={{ fontSize: '14.5px', fontWeight: '600', color: 'var(--xp-text)', margin: '0 0 10px' }}>Dangerous combinations</p>
             {AMPHETAMINE_INTERACTIONS.map(inter => (
-              <div key={inter.substance} style={{ marginBottom: '8px', padding: '8px 10px', background: inter.color + '11', border: `1px solid ${inter.color}33`, borderRadius: '8px' }}>
+              <div key={inter.substance} style={{ marginBottom: '8px', padding: '8px 10px', background: inter.color + '11', border: `1px solid ${inter.color}33`, borderRadius: '3px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff' }}>{inter.substance}</span>
-                  <span style={{ fontSize: '10px', fontWeight: '600', padding: '1px 8px', borderRadius: '999px', background: inter.color, color: 'white' }}>{inter.severity}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: '600', color: 'var(--xp-text)' }}>{inter.substance}</span>
+                  <span style={{ fontSize: '11.5px', fontWeight: '600', padding: '1px 8px', borderRadius: '2px', background: inter.color, color: 'white' }}>{inter.severity}</span>
                 </div>
-                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
+                <p style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
               </div>
             ))}
           </div>
 
           {/* Support */}
-          <div style={{ padding: '10px 14px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>
+          <div className="xp-group" style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)', padding: '12px 14px' }}>
             Concerned about stimulant use? <a href="https://www.jellinek.nl" target="_blank" rel="noopener noreferrer" style={{ color: pk.color }}>Jellinek.nl</a> and <a href="https://www.trimbos.nl" target="_blank" rel="noopener noreferrer" style={{ color: pk.color }}>Trimbos.nl</a> offer free, confidential support.
           </div>
         </div>
       </div>
+      </Window>
     </main>
   )
 }

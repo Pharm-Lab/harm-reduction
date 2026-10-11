@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Window from '@/app/components/Window'
 
 const SOURCES = {
   'Alcohol Calculator': {
@@ -236,85 +237,52 @@ const SOURCES = {
 export default function Sources() {
   const [selected, setSelected] = useState(null)
   const topics = Object.keys(SOURCES)
-  const C = {
-    bg:'#0a0f1e', bgCard:'#0f1629', border:'rgba(255,255,255,0.07)',
-    borderHov:'rgba(255,255,255,0.13)', blue:'#2a6fdb', blueLight:'#93b4f7',
-    text:'#f0f4ff', textMid:'rgba(240,244,255,0.65)', textDim:'rgba(240,244,255,0.35)',
-  }
+  const shown = selected ? [selected] : topics
+  const count = shown.reduce((n, t) => n + SOURCES[t].sources.length, 0)
 
   return (
-    <main style={{ fontFamily:"'Inter',system-ui,sans-serif", background:C.bg, minHeight:'100vh', color:C.text }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        * { box-sizing:border-box; }
-        .src-pill { transition: background 0.15s, border-color 0.15s; cursor:pointer; }
-        .src-pill:hover { border-color: rgba(42,111,219,0.5) !important; background: rgba(42,111,219,0.15) !important; }
-        .src-card { transition: border-color 0.15s; }
-        .src-card:hover { border-color: rgba(255,255,255,0.14) !important; }
-      `}</style>
-
-      {/* Header */}
-      <div style={{ borderBottom:`1px solid ${C.border}`, padding:'2rem 2rem 1.5rem', maxWidth:'860px', margin:'0 auto' }}>
-        <p style={{ fontSize:'11px', color:C.blueLight, fontWeight:'700', letterSpacing:'0.12em', textTransform:'uppercase', margin:'0 0 6px' }}>Transparency</p>
-        <h1 style={{ fontSize:'28px', fontWeight:'800', letterSpacing:'-0.03em', color:C.text, margin:'0 0 6px' }}>Sources</h1>
-        <p style={{ fontSize:'14px', color:C.textMid, margin:0, lineHeight:'1.6' }}>
-          Source: trust me bro.{' '}
-          <span style={{ color:C.textDim, fontSize:'13px' }}>
-            (or click a tool below to see the actual papers)
-          </span>
+    <main className="xp-desktop">
+      <Window
+        title="Sources"
+        icon="folder"
+        status={[`${count} references`, selected ? selected : 'All topics']}
+      >
+        <p className="xp-intro">
+          Source: trust me bro. Or pick a tool below to see the actual papers.
         </p>
-      </div>
 
-      <div style={{ maxWidth:'860px', margin:'0 auto', padding:'1.5rem 2rem 4rem' }}>
-
-        {/* Filter pills */}
-        <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', marginBottom:'1.5rem' }}>
-          <button className="src-pill" onClick={() => setSelected(null)}
-            style={{ padding:'5px 14px', borderRadius:'999px', fontSize:'12px', fontWeight: selected===null?'600':'400',
-              border: selected===null ? `1px solid ${C.blue}` : `1px solid ${C.border}`,
-              background: selected===null ? `${C.blue}22` : 'transparent',
-              color: selected===null ? C.blueLight : C.textDim }}>
+        <div role="toolbar" aria-label="Filter by tool" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '4px', marginBottom: '6px', borderTop: '1px solid var(--xp-hi)', borderBottom: '1px solid var(--xp-lo)' }}>
+          <button onClick={() => setSelected(null)} aria-pressed={selected === null} style={{ padding: '3px 10px', fontSize: '13.5px' }}>
             All ({topics.length})
           </button>
           {topics.map(t => (
-            <button key={t} className="src-pill" onClick={() => setSelected(selected===t ? null : t)}
-              style={{ padding:'5px 14px', borderRadius:'999px', fontSize:'12px', fontWeight: selected===t?'600':'400',
-                border: selected===t ? `1px solid ${C.blue}` : `1px solid ${C.border}`,
-                background: selected===t ? `${C.blue}22` : 'transparent',
-                color: selected===t ? C.blueLight : C.textDim }}>
+            <button key={t} onClick={() => setSelected(selected === t ? null : t)} aria-pressed={selected === t} style={{ padding: '3px 10px', fontSize: '13.5px' }}>
               {t}
             </button>
           ))}
         </div>
 
-        {/* Source cards */}
-        {(selected ? [selected] : topics).map(topic => (
-          <div key={topic} className="src-card"
-            style={{ marginBottom:'10px', border:`1px solid ${C.border}`, borderRadius:'14px', overflow:'hidden' }}>
-            {/* Card header */}
-            <div style={{ background:'#0f1629', padding:'14px 18px', borderBottom:`1px solid ${C.border}` }}>
-              <h2 style={{ fontSize:'14px', fontWeight:'700', color:C.text, margin:'0 0 3px', letterSpacing:'-0.01em' }}>{topic}</h2>
-              <p style={{ fontSize:'12px', color:C.textDim, margin:0, lineHeight:'1.5' }}>{SOURCES[topic].description}</p>
-            </div>
-            {/* Citations */}
-            <div style={{ padding:'4px 0' }}>
+        {shown.map(topic => (
+          <section key={topic} className="xp-group" style={{ marginTop: '24px', paddingTop: '18px' }}>
+            <h2 className="xp-legend" style={{ fontWeight: 'bold' }}>{topic}</h2>
+            <p style={{ margin: '0 0 8px', color: 'var(--xp-text-dim)', fontSize: '13.5px' }}>{SOURCES[topic].description}</p>
+            <ol className="xp-well" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
               {SOURCES[topic].sources.map((s, i) => (
-                <div key={i} style={{ padding:'12px 18px', borderBottom: i < SOURCES[topic].sources.length-1 ? `1px solid ${C.border}` : 'none' }}>
-                  <p style={{ fontSize:'12px', color:C.textMid, margin:'0 0 4px', lineHeight:'1.6', fontStyle:'italic' }}>{s.citation}</p>
-                  <p style={{ fontSize:'11px', color:C.textDim, margin:0 }}>↳ {s.note}</p>
-                </div>
+                <li key={i} style={{ padding: '9px 12px', borderTop: i ? '1px solid #262b42' : 'none' }}>
+                  <p style={{ margin: '0 0 3px', fontSize: '13.5px', lineHeight: '1.6', fontStyle: 'italic' }}>{s.citation}</p>
+                  <p style={{ margin: 0, fontSize: '12.5px', color: 'var(--xp-text-dim)' }}>↳ {s.note}</p>
+                </li>
               ))}
-            </div>
-          </div>
+            </ol>
+          </section>
         ))}
 
-        {/* Footer note */}
-        <div style={{ marginTop:'1.5rem', padding:'16px 18px', background:'#0f1629', border:`1px solid ${C.border}`, borderRadius:'12px', fontSize:'12px', color:C.textDim, lineHeight:'1.7' }}>
-          <span style={{ color:C.textMid, fontWeight:'600' }}>Accessing sources:</span> Journal articles are available through Universiteit Leiden library (LUCRIS). Core textbooks — Rowland & Tozer, Shargel, Clayden, Hansen/Pedersen-Bjergaard/Rasmussen — are in UB Leiden.
+        <div className="xp-alert xp-alert-info" style={{ marginTop: '20px', fontSize: '13.5px', lineHeight: '1.7' }}>
+          <strong>Accessing sources:</strong> Journal articles are available through Universiteit Leiden library (LUCRIS). Core textbooks — Rowland & Tozer, Shargel, Clayden, Hansen/Pedersen-Bjergaard/Rasmussen — are in UB Leiden.
           <br /><br />
-          <span style={{ color:C.textMid, fontWeight:'600' }}>AI-generated content:</span> The drug interaction checker and exercise helper use Claude (Anthropic). AI output should be cross-checked against primary sources. myClearance is an educational tool — not a clinical decision support system.
+          <strong>AI-generated content:</strong> The drug interaction checker and exercise helper use Claude (Anthropic). AI output should be cross-checked against primary sources. myClearance is an educational tool — not a clinical decision support system.
         </div>
-      </div>
+      </Window>
     </main>
   )
 }

@@ -1,10 +1,15 @@
 'use client'
 import { useState, useEffect } from 'react'
 
+// On narrow portrait screens, suggest landscape once, as an XP dialog
+// that can be dismissed. The graphs are easier to read sideways, but
+// the site works in portrait too.
 export default function MobileRotatePrompt() {
   const [show, setShow] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
+    try { if (sessionStorage.getItem('rotate-dismissed')) setDismissed(true) } catch {}
     function check() {
       const isMobile = window.innerWidth < 768
       const isPortrait = window.innerHeight > window.innerWidth
@@ -19,50 +24,31 @@ export default function MobileRotatePrompt() {
     }
   }, [])
 
-  if (!show) return null
+  function dismiss() {
+    setDismissed(true)
+    try { sessionStorage.setItem('rotate-dismissed', '1') } catch {}
+  }
+
+  if (!show || dismissed) return null
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 9999,
-      background: 'rgba(10,15,30,0.96)',
-      backdropFilter: 'blur(12px)',
-      display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      gap: '20px', padding: '2rem', textAlign: 'center',
-      fontFamily: "'Inter',system-ui,sans-serif",
-    }}>
-      {/* Rotating phone icon */}
-      <div style={{ fontSize: '52px', animation: 'rotatePhone 2s ease-in-out infinite' }}>📱</div>
-      <style>{`
-        @keyframes rotatePhone {
-          0%   { transform: rotate(0deg);   }
-          30%  { transform: rotate(0deg);   }
-          60%  { transform: rotate(-90deg); }
-          90%  { transform: rotate(-90deg); }
-          100% { transform: rotate(0deg);   }
-        }
-      `}</style>
-
-      <div>
-        <p style={{ fontSize: '18px', fontWeight: '700', color: '#f0f4ff', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
-          Rotate your phone
-        </p>
-        <p style={{ fontSize: '14px', color: 'rgba(240,244,255,0.55)', margin: 0, lineHeight: '1.6' }}>
-          myClearance works best in landscape mode.<br />
-          Flip your phone sideways to continue.
-        </p>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(5,6,20,0.6)', display: 'grid', placeItems: 'center', padding: '16px' }}>
+      <div className="xp-window" role="dialog" aria-modal="true" aria-labelledby="rotate-title" style={{ width: 'min(320px, 100%)' }}>
+        <div className="xp-titlebar">
+          <h2 id="rotate-title">myClearance</h2>
+          <button className="xp-cap xp-cap-close" onClick={dismiss} aria-label="Close" style={{ padding: 0, cursor: 'pointer' }}>
+            <svg viewBox="0 0 11 11" aria-hidden="true"><path d="M2 2l7 7M9 2l-7 7" stroke="#fff" strokeWidth="2" /></svg>
+          </button>
+        </div>
+        <div className="xp-window-body">
+          <div className="xp-alert xp-alert-info" style={{ background: 'transparent', border: 0, marginBottom: '14px' }}>
+            The graphs are easier to read in landscape. Turn your phone sideways, or carry on in portrait.
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <button className="xp-btn" onClick={dismiss} autoFocus style={{ minWidth: '75px', padding: '4px 12px' }}>OK</button>
+          </div>
+        </div>
       </div>
-
-      <button
-        onClick={() => setShow(false)}
-        style={{
-          marginTop: '8px', padding: '8px 20px',
-          fontSize: '12px', color: 'rgba(240,244,255,0.35)',
-          background: 'none', border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '999px', cursor: 'pointer',
-        }}>
-        Continue anyway
-      </button>
     </div>
   )
 }

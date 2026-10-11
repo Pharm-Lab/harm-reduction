@@ -1,79 +1,5 @@
-'use client'
-import { useEffect, useRef } from 'react'
 import Link from 'next/link'
-
-const C = {
-  bg: '#0a0f1e', card: '#0f1629', border: 'rgba(255,255,255,0.07)',
-  blue: '#2a6fdb', blueLight: '#93b4f7', purple: '#7c3aed', purpleLight: '#c4b5fd',
-  text: '#f0f4ff', textMid: 'rgba(240,244,255,0.65)', textDim: 'rgba(240,244,255,0.35)',
-}
-
-const FLOATERS = ['🧪','⚗️','💊','🔬','🫀','📈','✨','🌙','⭐','🎵','🎹','🧬','🩺','🌿','💫','🎯','🔭','💉']
-
-function FloatCanvas() {
-  const ref = useRef(null)
-  const particles = useRef([])
-  const frame = useRef(null)
-
-  useEffect(() => {
-    const canvas = ref.current
-    if (!canvas) return
-    const W = canvas.offsetWidth
-    const H = canvas.offsetHeight
-    const dpr = window.devicePixelRatio || 1
-    canvas.width = W * dpr
-    canvas.height = H * dpr
-    const ctx = canvas.getContext('2d')
-    ctx.scale(dpr, dpr)
-
-    particles.current = Array.from({ length: 18 }, (_, i) => ({
-      emoji: FLOATERS[i % FLOATERS.length],
-      x: 15 + Math.random() * (W - 30),
-      // stagger initial positions throughout the canvas height so they don't all appear at once
-      y: Math.random() * H * 2,
-      size: 13 + Math.random() * 13,
-      speed: 0.18 + Math.random() * 0.22,   // slower
-      wobble: Math.random() * Math.PI * 2,
-      wobbleSpeed: 0.006 + Math.random() * 0.008,
-      wobbleAmp: 10 + Math.random() * 18,
-      baseAlpha: 0.3 + Math.random() * 0.35,
-    }))
-
-    const draw = () => {
-      ctx.clearRect(0, 0, W, H)
-      particles.current.forEach(p => {
-        p.y -= p.speed
-        p.wobble += p.wobbleSpeed
-        const x = p.x + Math.sin(p.wobble) * p.wobbleAmp
-
-        // reset when fully above canvas
-        if (p.y < -60) {
-          p.y = H + 40 + Math.random() * 80
-          p.x = 15 + Math.random() * (W - 30)
-        }
-
-        // smooth fade in from bottom, fade out near top — longer transition zone to avoid blipping
-        const fadeIn  = Math.min(1, (H - p.y) / 150)
-        const fadeOut = Math.min(1, (p.y + 100) / 150)
-        const alpha = p.baseAlpha * Math.max(0, Math.min(fadeIn, fadeOut))
-
-        if (alpha < 0.01) return   // skip invisible particles entirely
-
-        ctx.globalAlpha = alpha
-        ctx.font = `${p.size}px sans-serif`
-        ctx.textAlign = 'center'
-        ctx.fillText(p.emoji, x, p.y)
-      })
-      ctx.globalAlpha = 1
-      frame.current = requestAnimationFrame(draw)
-    }
-
-    frame.current = requestAnimationFrame(draw)
-    return () => cancelAnimationFrame(frame.current)
-  }, [])
-
-  return <canvas ref={ref} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
-}
+import Window from '@/app/components/Window'
 
 const sections = [
   {
@@ -114,69 +40,61 @@ const sections = [
 
 export default function AboutPage() {
   return (
-    <div style={{ background: C.bg, minHeight: '100vh', color: C.text, fontFamily: "'Inter',system-ui,sans-serif" }}>
+    <main className="xp-desktop">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        * { box-sizing: border-box; }
-        .about-p { font-size: 14px; color: rgba(240,244,255,0.62); line-height: 1.8; margin: 0 0 12px; }
+        .about-banner {
+          display: flex; align-items: center; gap: 16px;
+          margin: -14px -14px 0; padding: 22px 22px 18px;
+          background:
+            radial-gradient(ellipse 60% 120% at 100% 0%, rgba(167,139,250,.35), transparent 60%),
+            linear-gradient(180deg, #2a1f6b, #1b1450);
+          border-bottom: 2px solid; border-image: linear-gradient(90deg, #f5a623, #a78bfa 40%, #2f6fdb) 1;
+        }
+        .about-banner h1 { margin: 0; font: italic bold clamp(26px, 5vw, 38px) var(--xp-font-title); letter-spacing: -0.01em; color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,.4); }
+        .about-banner h1 .my { color: #c9b8ff; font-weight: normal; }
+        .about-banner p { margin: 2px 0 0; color: #c9cde3; }
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 22px; margin-top: 8px; }
+        .about-p { margin: 0 0 10px; line-height: 1.75; max-width: 68ch; }
         .about-p:last-child { margin-bottom: 0; }
+        @media (max-width: 760px) { .about-grid { grid-template-columns: 1fr; } }
       `}</style>
 
-      {/* Hero */}
-      <div style={{ position: 'relative', overflow: 'hidden', minHeight: '440px', display: 'flex', alignItems: 'center', borderBottom: `1px solid ${C.border}` }}>
-
-        {/* Floating emojis — right side */}
-        <div style={{ position: 'absolute', right: 0, top: 0, width: '42%', height: '100%' }}>
-          <FloatCanvas />
-          {/* left-edge fade */}
-          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to right, ${C.bg} 0%, transparent 40%)`, pointerEvents: 'none' }} />
-          {/* bottom fade */}
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '120px', background: `linear-gradient(to bottom, transparent, ${C.bg})`, pointerEvents: 'none' }} />
-        </div>
-
-        {/* Text */}
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '1000px', margin: '0 auto', padding: '5rem 2rem', width: '100%' }}>
-          <div style={{ maxWidth: '500px' }}>
-            <Link href="/" style={{ fontSize: '13px', color: C.textDim, textDecoration: 'none', display: 'inline-block', marginBottom: '2rem' }}>← Home</Link>
-            <p style={{ fontSize: '11px', color: C.blueLight, fontWeight: '700', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '14px', margin: '0 0 14px' }}>About</p>
-            <h1 style={{ fontSize: 'clamp(30px, 5vw, 50px)', fontWeight: '800', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, margin: '0 0 20px' }}>
-              A student project<br />
-              <span style={{ background: `linear-gradient(135deg, ${C.blue}, ${C.purple})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                that got out of hand.
-              </span>
-            </h1>
-            <p style={{ fontSize: '15px', color: C.textMid, lineHeight: '1.7', margin: 0 }}>
-              Built in between lectures, practicals, and parties. Turned into something I actually think is useful.
-            </p>
+      <Window
+        title="About myClearance"
+        icon="info"
+        status={['Independent student project', 'Not affiliated with Leiden University or any institution']}
+      >
+        <div className="about-banner">
+          <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true" style={{ flex: 'none' }}>
+            <defs>
+              <linearGradient id="about-fade" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#a78bfa" />
+                <stop offset="1" stopColor="#7c3aed" stopOpacity="0.25" />
+              </linearGradient>
+            </defs>
+            <path d="M47.56 16.44 A22 22 0 1 0 47.56 47.56" fill="none" stroke="url(#about-fade)" strokeWidth="7" strokeLinecap="round" />
+            <circle cx="47.56" cy="16.44" r="6" fill="#a78bfa" />
+          </svg>
+          <div>
+            <h1><span className="my">my</span>Clearance</h1>
+            <p>A student project that got out of hand. Built in between lectures, practicals and parties.</p>
           </div>
         </div>
-      </div>
 
-      {/* Sections */}
-      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '4rem 2rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem 5rem' }}>
+        <div className="about-grid">
           {sections.map((s, i) => (
-            <div key={i}>
-              <p style={{ fontSize: '10px', color: C.blueLight, fontWeight: '700', letterSpacing: '0.14em', textTransform: 'uppercase', margin: '0 0 8px' }}>{s.label}</p>
-              <h2 style={{ fontSize: '19px', fontWeight: '700', color: C.text, letterSpacing: '-0.02em', margin: '0 0 14px' }}>{s.title}</h2>
+            <section key={i} className="xp-group" style={{ marginTop: '22px', paddingTop: '18px' }}>
+              <h2 className="xp-legend" style={{ fontWeight: 'bold' }}>{s.title}</h2>
               {s.paras.map((p, j) => <p key={j} className="about-p">{p}</p>)}
-            </div>
+            </section>
           ))}
         </div>
 
-        {/* Footer */}
-        <div style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: `1px solid ${C.border}` }}>
-          <p style={{ fontSize: '13px', color: C.textDim, lineHeight: '1.7', maxWidth: '580px', margin: '0 0 24px' }}>
-            myClearance is an independent student project — not affiliated with Leiden University or any institution. Educational purposes only. PK models use population averages. Nothing here is medical advice.
-          </p>
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-            <Link href="/tools"          style={{ fontSize: '13px', color: C.blueLight,   textDecoration: 'none' }}>Academic tools →</Link>
-            <Link href="/lab"            style={{ fontSize: '13px', color: C.blueLight,   textDecoration: 'none' }}>Lab toolkit →</Link>
-            <Link href="/harm-reduction" style={{ fontSize: '13px', color: C.purpleLight, textDecoration: 'none' }}>Harm reduction →</Link>
-            <Link href="/sources"        style={{ fontSize: '13px', color: C.textDim,     textDecoration: 'none' }}>Sources →</Link>
-          </div>
+        <div className="xp-alert xp-alert-info" style={{ marginTop: '18px' }}>
+          Educational purposes only. The models use population averages, and nothing here is medical advice.
+          See the <Link href="/sources">sources</Link> behind every calculator, or go to the <Link href="/harm-reduction">calculators</Link>.
         </div>
-      </div>
-    </div>
+      </Window>
+    </main>
   )
 }

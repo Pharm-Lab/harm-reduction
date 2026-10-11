@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import Window from '@/app/components/Window'
 import {
   MEPHEDRONE_PK, CATHINONE_MARKET_DATA, CATHINONE_COMPOUNDS,
   CATHINONE_INTERACTIONS, simulateMephedrone, calcMephedroneMetrics,
@@ -87,7 +88,7 @@ export default function CathinonesPage() {
     const maxT    = ts
 
     ctx.clearRect(0, 0, W, H)
-    ctx.fillStyle = 'white'
+    ctx.fillStyle = '#11141f'
     ctx.fillRect(0, 0, W, H)
 
     const xS = t => pad.left + (Math.min(t, maxT) / maxT) * cW
@@ -110,7 +111,7 @@ export default function CathinonesPage() {
     })
 
     // Grid
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)'; ctx.lineWidth = 1
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1
     const yLines = Array.from({ length: Math.floor(dispMax / 50) + 1 }, (_, i) => i * 50).filter(v => v <= dispMax)
     yLines.forEach(v => {
       ctx.beginPath(); ctx.moveTo(pad.left, yS(v)); ctx.lineTo(pad.left + cW, yS(v)); ctx.stroke()
@@ -122,7 +123,7 @@ export default function CathinonesPage() {
     }
 
     // Axis labels
-    ctx.fillStyle = '#374151'; ctx.font = '11px sans-serif'
+    ctx.fillStyle = '#9aa1bf'; ctx.font = '11px Tahoma, Verdana, sans-serif'
     ctx.textAlign = 'right'
     yLines.forEach(v => ctx.fillText(v + ' ng/mL', pad.left - 4, yS(v) + 4))
     ctx.textAlign = 'center'
@@ -132,12 +133,12 @@ export default function CathinonesPage() {
     ctx.save()
     ctx.translate(12, pad.top + cH / 2)
     ctx.rotate(-Math.PI / 2)
-    ctx.textAlign = 'center'; ctx.font = '10px sans-serif'; ctx.fillStyle = '#9ca3af'
+    ctx.textAlign = 'center'; ctx.font = '10px Tahoma, Verdana, sans-serif'; ctx.fillStyle = '#9ca3af'
     ctx.fillText('Mephedrone plasma (ng/mL) — estimated', 0, 0)
     ctx.restore()
-    ctx.textAlign = 'center'; ctx.fillStyle = '#374151'; ctx.font = '11px sans-serif'
+    ctx.textAlign = 'center'; ctx.fillStyle = '#9aa1bf'; ctx.font = '11px Tahoma, Verdana, sans-serif'
     ctx.fillText('Time after dose (h)', pad.left + cW / 2, H - 8)
-    ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1
+    ctx.strokeStyle = '#4a5274'; ctx.lineWidth = 1
     ctx.strokeRect(pad.left, pad.top, cW, cH)
 
     // Wide uncertainty band (low to high ke)
@@ -152,7 +153,7 @@ export default function CathinonesPage() {
     ctx.globalAlpha = 1
 
     // Uncertainty band label
-    ctx.fillStyle = '#f97316'; ctx.font = '9px sans-serif'; ctx.textAlign = 'left'
+    ctx.fillStyle = '#f97316'; ctx.font = '9px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'left'
     ctx.fillText('Uncertainty range (t½ 1.5–3.6h)', pad.left + 4, pad.top + 14)
 
     // Dose markers
@@ -164,9 +165,9 @@ export default function CathinonesPage() {
         ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + cH); ctx.stroke()
         ctx.setLineDash([])
       }
-      ctx.font = '12px sans-serif'; ctx.textAlign = 'center'
+      ctx.font = '12px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'
       ctx.fillText('💊', x, pad.top + cH + 40)
-      ctx.fillStyle = '#6b7280'; ctx.font = '9px sans-serif'
+      ctx.fillStyle = '#6b7280'; ctx.font = '9px Tahoma, Verdana, sans-serif'
       ctx.fillText(d.timeh === 0 ? 't=0' : '+' + d.timeh + 'h', x, pad.top + cH + 50)
     })
 
@@ -181,7 +182,7 @@ export default function CathinonesPage() {
     if (m && m.tmax <= maxT) {
       ctx.fillStyle = '#f97316'
       ctx.beginPath(); ctx.arc(xS(m.tmax), yS(m.cmax), 5, 0, Math.PI * 2); ctx.fill()
-      ctx.fillStyle = '#111827'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'
+      ctx.fillStyle = '#e8ebf7'; ctx.font = 'bold 11px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'
       ctx.fillText('Peak ~' + m.cmax + ' ng/mL', xS(m.tmax), yS(m.cmax) - 10)
     }
   }
@@ -208,17 +209,15 @@ export default function CathinonesPage() {
   }
 
   return (
-    <main style={{ maxWidth: '980px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; }`}</style>
-      <a href="/harm-reduction" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none' }}>← Harm reduction</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px' }}>Synthetic Cathinones</h1>
-      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
+    <main className="xp-desktop">
+      <Window title="Synthetic cathinones" icon="substance:cathinones" closeHref="/harm-reduction" status={['Mephedrone model, wide uncertainty', 'Runs on your device. Nothing you enter is sent anywhere.']}>
+      <p className="xp-intro">
         The cathinone market in the Netherlands and Germany is currently one of the most unreliable drug markets in Europe. The PK model below applies to mephedrone only — for everything else, the honest answer is we do not have reliable human data.
       </p>
 
       {/* Critical market warning */}
-      <div style={{ background: 'rgba(185,28,28,0.2)', border: '2px solid rgba(239,68,68,0.6)', borderRadius: '10px', padding: '14px 16px', marginBottom: '12px', fontSize: '13px', color: '#fca5a5' }}>
-        <strong>⚠ Critical market warning — Netherlands and Germany (2025):</strong>
+      <div className="xp-alert xp-alert-error" style={{ marginBottom: '12px', fontSize: '14.5px' }}>
+        <strong>Critical market warning — Netherlands and Germany (2025):</strong>
         <ul style={{ margin: '8px 0 0', paddingLeft: '20px', lineHeight: '1.8' }}>
           <li>Only <strong>3%</strong> of samples sold as 3-MMC in the Netherlands actually contain 3-MMC (Trimbos DIMS 2025 — down from 30% in 2023)</li>
           <li><strong>76%</strong> contain 2-MMC instead — different compound, essentially unknown long-term safety profile</li>
@@ -229,7 +228,7 @@ export default function CathinonesPage() {
       </div>
 
       {/* PK disclaimer */}
-      <div style={{ background: 'rgba(120,53,15,0.25)', border: '1px solid rgba(249,115,22,0.5)', borderRadius: '10px', padding: '10px 14px', marginBottom: '1.5rem', fontSize: '12px', color: '#fdba74' }}>
+      <div className="xp-alert xp-alert-warn" style={{ marginBottom: '1.5rem', fontSize: '13.5px' }}>
         <strong>PK data disclaimer:</strong> The curve below models mephedrone (4-MMC) only, using limited human data. The uncertainty band is intentionally wide — individual variation is larger here than for any other substance on this page. For 2-MMC, 3-MMC, and NEP there is essentially no published human pharmacokinetic data. Do not use this model for those compounds.
       </div>
 
@@ -239,76 +238,76 @@ export default function CathinonesPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {/* Personal */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Mephedrone (4-MMC) model</p>
-            <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
+          <div className="xp-group">
+            <p className="xp-legend">Mephedrone (4-MMC) model</p>
+            <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <input type="number" value={rawWeight} min={40} max={150}
                 onChange={e => { setRawWeight(e.target.value); const n = parseFloat(e.target.value); if (n >= 40 && n <= 150) setWeightKg(n) }}
                 onBlur={() => { const n = parseFloat(rawWeight); if (isNaN(n) || n < 40 || n > 150) { setWeightKg(70); setRawWeight('70') } }}
-                style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: '#060b18' }} />
-              <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>kg</span>
+                style={{ width: '60px', padding: '4px 8px', borderRadius: '2px', border: '1px solid var(--xp-etch)', fontSize: '15.5px', fontWeight: '600', color: 'var(--xp-text)', textAlign: 'right', background: 'var(--xp-sunken)' }} />
+              <span style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)' }}>kg</span>
               <input type="range" min={40} max={150} step={1} value={weightKg}
                 onChange={e => { setWeightKg(parseInt(e.target.value)); setRawWeight(e.target.value) }}
-                style={{ flex: 1, accentColor: '#f97316' }} />
+                style={{ flex: 1, accentColor: '#2fb34a' }} />
             </div>
-            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', margin: 0 }}>
+            <p style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', margin: 0 }}>
               Curve models mephedrone only. t½ ~2.5h (range 1.5–3.6h). Wide uncertainty band reflects limited human data.
             </p>
           </div>
 
           {/* Dose schedule */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dose schedule (mephedrone model)</p>
+          <div className="xp-group">
+            <p className="xp-legend">Dose schedule (mephedrone model)</p>
 
             {doses.map((d, idx) => (
-              <div key={d.id} style={{ background: '#060b18', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
+              <div key={d.id} style={{ background: 'var(--xp-sunken)', border: '1px solid var(--xp-etch)', borderRadius: '3px', padding: '10px 12px', marginBottom: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>
+                  <span style={{ fontSize: '13.5px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>
                     {idx === 0 ? 'First dose' : `Dose ${idx + 1}`}
                   </span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)' }}>{d.doseMg}mg</span>
+                    <span style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)' }}>{d.doseMg}mg</span>
                     {doses.length > 1 && (
                       <button onClick={() => removeDose(d.id)}
-                        style={{ fontSize: '18px', color: 'rgba(240,244,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
+                        style={{ fontSize: '18px', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
                     )}
                   </div>
                 </div>
 
                 <div style={{ marginBottom: idx === 0 ? 0 : '8px' }}>
-                  <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
+                  <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>
                     Amount: {d.doseMg}mg (mephedrone model only)
                   </label>
                   <input type="range" min={25} max={300} step={5} value={d.doseMg}
                     onChange={e => updateDose(d.id, 'doseMg', parseInt(e.target.value))}
-                    style={{ width: '100%', accentColor: '#f97316' }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
+                    style={{ width: '100%', accentColor: '#2fb34a' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', color: '#6d7494' }}>
                     <span>25mg</span><span>300mg</span>
                   </div>
                 </div>
 
                 {idx > 0 && (
                   <div>
-                    <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
+                    <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>
                       +{d.timeh}h after first dose
                     </label>
                     <input type="range" min={0.5} max={12} step={0.5} value={d.timeh}
                       onChange={e => updateDose(d.id, 'timeh', parseFloat(e.target.value))}
-                      style={{ width: '100%', accentColor: '#f97316' }} />
+                      style={{ width: '100%', accentColor: '#2fb34a' }} />
                   </div>
                 )}
               </div>
             ))}
 
             <button onClick={addDose}
-              style={{ width: '100%', padding: '8px', border: '1px dashed rgba(249,115,22,0.4)', borderRadius: '8px', background: 'transparent', fontSize: '13px', color: '#f97316', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '8px', fontSize: '14.5px', cursor: 'pointer' }}>
               + Add another dose
             </button>
 
-            <div style={{ marginTop: '10px', padding: '8px 12px', background: 'rgba(120,53,15,0.25)', border: '1px solid rgba(249,115,22,0.5)', borderRadius: '8px', fontSize: '12px', color: '#fdba74' }}>
+            <div className="xp-alert xp-alert-warn" style={{ marginTop: '10px', fontSize: '13.5px' }}>
               Total: <strong>{totalDose}mg</strong>
-              <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginLeft: '6px' }}>
+              <span style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', marginLeft: '6px' }}>
                 ({(totalDose / weightKg).toFixed(2)} mg/kg) — mephedrone model
               </span>
             </div>
@@ -321,18 +320,18 @@ export default function CathinonesPage() {
           {/* Canvas */}
           <div style={{ position: 'relative', width: '100%', height: '300px' }}>
             <canvas ref={canvasRef}
-              style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: '#060b18' }} />
+              className="xp-well" style={{ width: '100%', height: '100%' }} />
           </div>
 
           {/* Graph controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: 'rgba(240,244,255,0.3)', whiteSpace: 'nowrap' }}>SHOW</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13.5px' }}>
+            <span style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--xp-text-dim)', whiteSpace: 'nowrap' }}>SHOW</span>
             <input type="range" min={4} max={24} step={2} value={timeScale}
               onChange={e => setTimeScale(parseInt(e.target.value))}
-              style={{ flex: 1, accentColor: '#f97316' }} />
+              style={{ flex: 1, accentColor: '#2fb34a' }} />
             <span style={{ fontWeight: '600', color: 'rgba(240,244,255,0.75)', minWidth: '28px' }}>{timeScale}h</span>
             <button onClick={exportGraph}
-              style={{ padding: '5px 12px', background: '#2a6fdb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              style={{ padding: '5px 12px', fontSize: '12.5px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               ↓ Export PNG
             </button>
           </div>
@@ -345,10 +344,10 @@ export default function CathinonesPage() {
                 { label: 'Time to peak',     value: formatHours(metrics.tmax),      sub: 'estimated' },
                 { label: 'Sub-threshold at', value: metrics.clearTime != null ? formatHours(metrics.clearTime) : '>24h', sub: 'mean estimate' },
               ].map(m => (
-                <div key={m.label} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
-                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '2px' }}>{m.label}</div>
-                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#f0f4ff' }}>{m.value}</div>
-                  <div style={{ fontSize: '10px', color: 'rgba(240,244,255,0.3)' }}>{m.sub}</div>
+                <div key={m.label} style={{ background: 'var(--xp-face-2)', border: '1px solid var(--xp-etch)', borderRadius: '3px', padding: '10px 12px' }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', marginBottom: '2px' }}>{m.label}</div>
+                  <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--xp-text)' }}>{m.value}</div>
+                  <div style={{ fontSize: '11.5px', color: 'var(--xp-text-dim)' }}>{m.sub}</div>
                 </div>
               ))}
             </div>
@@ -358,10 +357,10 @@ export default function CathinonesPage() {
 
       {/* Compound information cards */}
       <div style={{ marginTop: '2rem' }}>
-        <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#f0f4ff', marginBottom: '1rem' }}>
+        <h2 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--xp-text)', marginBottom: '1rem' }}>
           What is actually in the NL/DE market
         </h2>
-        <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1rem' }}>
+        <p style={{ fontSize: '14.5px', color: 'var(--xp-text-dim)', marginBottom: '1rem' }}>
           The following compounds are what drug checking services actually find — not what products are sold as.
         </p>
 
@@ -369,35 +368,35 @@ export default function CathinonesPage() {
           {CATHINONE_COMPOUNDS.map(c => {
             const st = STATUS_STYLE[c.status]
             return (
-              <div key={c.id} style={{ background: st.bg, border: `1px solid ${st.border}`, borderRadius: '12px', padding: '1rem' }}>
+              <div key={c.id} style={{ background: st.bg, border: `1px solid ${st.border}`, borderRadius: '3px', padding: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                  <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#f0f4ff', margin: 0 }}>{c.name}</h3>
-                  <span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '999px', background: st.badge, color: 'white', whiteSpace: 'nowrap', marginLeft: '8px' }}>{st.text}</span>
+                  <h3 style={{ fontSize: '15.5px', fontWeight: '600', color: 'var(--xp-text)', margin: 0 }}>{c.name}</h3>
+                  <span style={{ fontSize: '11.5px', fontWeight: '600', padding: '2px 8px', borderRadius: '2px', background: st.badge, color: 'white', whiteSpace: 'nowrap', marginLeft: '8px' }}>{st.text}</span>
                 </div>
-                {c.aka && <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', margin: '0 0 8px' }}>Also known as: {c.aka}</p>}
-                <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', margin: '0 0 6px', lineHeight: '1.5' }}>{c.note}</p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginTop: '8px', fontSize: '11px' }}>
-                  <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: '6px', padding: '6px 8px' }}>
-                    <div style={{ color: 'rgba(240,244,255,0.3)', marginBottom: '2px' }}>t½</div>
+                {c.aka && <p style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', margin: '0 0 8px' }}>Also known as: {c.aka}</p>}
+                <p style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', margin: '0 0 6px', lineHeight: '1.5' }}>{c.note}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginTop: '8px', fontSize: '12.5px' }}>
+                  <div style={{ background: 'var(--xp-face-2)', borderRadius: '2px', padding: '6px 8px' }}>
+                    <div style={{ color: 'var(--xp-text-dim)', marginBottom: '2px' }}>t½</div>
                     <div style={{ color: 'rgba(240,244,255,0.75)', fontWeight: '500' }}>{c.halflife}</div>
                   </div>
-                  <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: '6px', padding: '6px 8px' }}>
-                    <div style={{ color: 'rgba(240,244,255,0.3)', marginBottom: '2px' }}>PK data quality</div>
+                  <div style={{ background: 'var(--xp-face-2)', borderRadius: '2px', padding: '6px 8px' }}>
+                    <div style={{ color: 'var(--xp-text-dim)', marginBottom: '2px' }}>PK data quality</div>
                     <div style={{ color: 'rgba(240,244,255,0.75)', fontWeight: '500' }}>{c.pkQuality === 'none' ? '❌ No human data' : c.pkQuality === 'minimal' ? '⚠ Minimal' : '⚠ Limited'}</div>
                   </div>
                 </div>
                 {c.warning && (
-                  <div style={{ marginTop: '8px', padding: '6px 8px', background: 'rgba(185,28,28,0.2)', border: '1px solid rgba(239,68,68,0.5)', borderRadius: '6px', fontSize: '11px', color: '#fca5a5' }}>
+                  <div className="xp-alert xp-alert-error" style={{ marginTop: '8px', fontSize: '12.5px' }}>
                     ⚠ <strong>Overdose risk:</strong> Dosing NEP based on experience with 2-MMC or 3-MMC will likely result in overdose. Significantly more potent.
                   </div>
                 )}
                 <div style={{ marginTop: '6px' }}>
-                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginBottom: '2px' }}>Effects</div>
-                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.75)' }}>{c.effects}</div>
+                  <div style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', marginBottom: '2px' }}>Effects</div>
+                  <div style={{ fontSize: '12.5px', color: 'rgba(240,244,255,0.75)' }}>{c.effects}</div>
                 </div>
                 <div style={{ marginTop: '6px' }}>
-                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginBottom: '2px' }}>Key risks</div>
-                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.75)' }}>{c.risks}</div>
+                  <div style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', marginBottom: '2px' }}>Key risks</div>
+                  <div style={{ fontSize: '12.5px', color: 'rgba(240,244,255,0.75)' }}>{c.risks}</div>
                 </div>
               </div>
             )
@@ -405,14 +404,14 @@ export default function CathinonesPage() {
         </div>
 
         {/* Market data visualisation */}
-        <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 4px' }}>
+        <div className="xp-group" style={{ marginBottom: '1.5rem', padding: '12px 14px' }}>
+          <h3 style={{ fontSize: '15.5px', fontWeight: '600', color: 'var(--xp-text)', margin: '0 0 4px' }}>
             What was found in samples sold as "3-MMC" — per tested unit
           </h3>
-          <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.4)', margin: '0 0 4px' }}>
+          <p style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', margin: '0 0 4px' }}>
             Source: Trimbos DIMS Jaarbericht 2025 — {CATHINONE_MARKET_DATA.year}
           </p>
-          <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.4)', margin: '0 0 12px' }}>
+          <p style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', margin: '0 0 12px' }}>
             Each bar shows the % of individually tested samples that contained this substance. A single unit may contain only one of these — results vary per sample.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -420,10 +419,10 @@ export default function CathinonesPage() {
                 { label: '3-MMC (actual)', pct: CATHINONE_MARKET_DATA.percentage3MMC, color: '#22c55e' },
                 { label: '2-MMC',          pct: CATHINONE_MARKET_DATA.percentage2MMC, color: '#f97316' },
                 { label: 'NEP',            pct: CATHINONE_MARKET_DATA.percentageNEP,  color: '#dc2626' },
-                { label: 'Other / unknown',pct: 100 - CATHINONE_MARKET_DATA.percentage3MMC - CATHINONE_MARKET_DATA.percentage2MMC - CATHINONE_MARKET_DATA.percentageNEP, color: 'rgba(240,244,255,0.3)' },
+                { label: 'Other / unknown',pct: 100 - CATHINONE_MARKET_DATA.percentage3MMC - CATHINONE_MARKET_DATA.percentage2MMC - CATHINONE_MARKET_DATA.percentageNEP, color: 'var(--xp-text-dim)' },
             ].map(item => (
                 <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.7)', width: '130px', flexShrink: 0 }}>{item.label}</span>
+                    <span style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.7)', width: '130px', flexShrink: 0 }}>{item.label}</span>
                     <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: '4px', height: '22px', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ width: `${item.pct}%`, height: '100%', background: item.color, borderRadius: '4px' }} />
                         <span style={{
@@ -431,7 +430,7 @@ export default function CathinonesPage() {
                             right: '8px',
                             top: '50%',
                             transform: 'translateY(-50%)',
-                            fontSize: '11px',
+                            fontSize: '12.5px',
                             fontWeight: '600',
                             color: 'white',
                          }}>
@@ -444,24 +443,25 @@ export default function CathinonesPage() {
         </div>
 
         {/* Dangerous combinations */}
-        <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px', marginBottom: '1.5rem' }}>
-          <p style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 10px' }}>Dangerous combinations</p>
+        <div className="xp-group" style={{ marginBottom: '1.5rem', padding: '12px 14px' }}>
+          <p style={{ fontSize: '14.5px', fontWeight: '600', color: 'var(--xp-text)', margin: '0 0 10px' }}>Dangerous combinations</p>
           {CATHINONE_INTERACTIONS.map(inter => (
-            <div key={inter.substance} style={{ marginBottom: '8px', padding: '8px 10px', background: inter.color + '11', border: `1px solid ${inter.color}33`, borderRadius: '8px' }}>
+            <div key={inter.substance} style={{ marginBottom: '8px', padding: '8px 10px', background: inter.color + '11', border: `1px solid ${inter.color}33`, borderRadius: '3px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                <span style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff' }}>{inter.substance}</span>
-                <span style={{ fontSize: '10px', fontWeight: '600', padding: '1px 8px', borderRadius: '999px', background: inter.color, color: 'white' }}>{inter.severity}</span>
+                <span style={{ fontSize: '13.5px', fontWeight: '600', color: 'var(--xp-text)' }}>{inter.substance}</span>
+                <span style={{ fontSize: '11.5px', fontWeight: '600', padding: '1px 8px', borderRadius: '2px', background: inter.color, color: 'white' }}>{inter.severity}</span>
               </div>
-              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
+              <p style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
             </div>
           ))}
         </div>
 
         {/* Support */}
-        <div style={{ padding: '10px 14px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>
+        <div className="xp-group" style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)', padding: '12px 14px' }}>
           Concerned about cathinone use? <a href="https://www.jellinek.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#f97316' }}>Jellinek.nl</a>, <a href="https://www.trimbos.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#f97316' }}>Trimbos.nl</a>, and <a href="https://www.drugsinfo.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#f97316' }}>Drugsinfo.nl</a> offer free, confidential support and up-to-date drug safety information.
         </div>
       </div>
+      </Window>
     </main>
   )
 }

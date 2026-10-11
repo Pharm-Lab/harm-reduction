@@ -1,3 +1,4 @@
+import Window from '@/app/components/Window'
 export default function HarmReductionGuide() {
   const sections = [
     {
@@ -85,42 +86,34 @@ The models are educational tools to illustrate concepts — not precise predicto
     },
   ]
 
-  const highlightStyles = {
-    red:   { bg: 'rgba(185,28,28,0.2)',  border: 'rgba(239,68,68,0.5)',   text: '#fca5a5' },
-    amber: { bg: 'rgba(120,53,15,0.25)', border: 'rgba(249,115,22,0.5)',  text: '#fdba74' },
-  }
 
   return (
-    <main style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh', color: '#f0f4ff' }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; }`}</style>
-      <a href="/harm-reduction" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none' }}>← Harm reduction</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px', letterSpacing: '-0.02em' }}>How to read the graphs</h1>
-      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.5)', marginBottom: '2rem', lineHeight: '1.6' }}>
+    <main className="xp-desktop" style={{ maxWidth: '840px' }}>
+      <Window title="How to read the graphs" icon="guide" closeHref="/harm-reduction" status={['PK graph guide']}>
+      <p className="xp-intro">
         The calculators on this site show pharmacokinetic curves — plasma drug concentrations over time. These are not the same as "how high you feel." Here is what they actually mean and why that difference matters.
       </p>
 
       {sections.map((section, i) => {
-        const hl = section.highlight ? highlightStyles[section.highlight] : null
-        return (
-          <div key={i} style={{
-            marginBottom: '1rem',
-            background: hl ? hl.bg : '#0f1629',
-            border: `1px solid ${hl ? hl.border : 'rgba(255,255,255,0.07)'}`,
-            borderRadius: '12px',
-            padding: '1.25rem',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-              <span style={{ fontSize: '22px' }}>{section.emoji}</span>
-              <h2 style={{ fontSize: '15px', fontWeight: '600', color: hl ? hl.text : '#f0f4ff', margin: 0 }}>{section.title}</h2>
-            </div>
-            {section.content.split('\n\n').map((para, j) => (
-              <p key={j} style={{ fontSize: '13px', color: hl ? hl.text : 'rgba(240,244,255,0.7)', margin: '0 0 10px', lineHeight: '1.7', whiteSpace: 'pre-line' }}>
-                {para}
-              </p>
-            ))}
+        const kind = section.highlight === 'red' ? 'error' : section.highlight === 'amber' ? 'warn' : null
+        const body = section.content.split('\n\n').map((para, j) => (
+          <p key={j} style={{ margin: '0 0 10px', lineHeight: '1.7', whiteSpace: 'pre-line' }}>{para}</p>
+        ))
+        return kind ? (
+          <div key={i} className={`xp-alert xp-alert-${kind}`} style={{ margin: '18px 0 6px' }}>
+            <h2 style={{ fontSize: '14.5px', fontWeight: 'bold', margin: '0 0 8px', color: '#fff' }}>{section.title}</h2>
+            {body}
+          </div>
+        ) : (
+          <div key={i} className="xp-group" style={{ margin: '22px 0 6px', paddingTop: '18px' }}>
+            <h2 className="xp-legend" style={{ fontSize: '14.5px', fontWeight: 'bold' }}>
+              <span aria-hidden="true" style={{ marginRight: '6px' }}>{section.emoji}</span>{section.title}
+            </h2>
+            {body}
           </div>
         )
       })}
+      </Window>
     </main>
   )
 }

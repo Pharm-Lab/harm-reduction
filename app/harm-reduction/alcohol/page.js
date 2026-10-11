@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import Window from '@/app/components/Window'
 import {
   COUNTRIES, BAC_ZONES, DRINK_TYPES, DRINK_VOLUMES,
   simulateBAC, calcBACMetrics, formatHours,
@@ -139,7 +140,7 @@ export default function AlcoholCalculator() {
     const maxT    = ts
 
     ctx.clearRect(0, 0, W, H)
-    ctx.fillStyle = 'white'
+    ctx.fillStyle = '#11141f'
     ctx.fillRect(0, 0, W, H)
 
     const xS = t   => pad.left + (Math.min(t, maxT) / maxT) * cW
@@ -158,7 +159,7 @@ export default function AlcoholCalculator() {
       if (Math.min(y1, pad.top + cH) - Math.max(y0, pad.top) > 14) {
         ctx.fillStyle   = zone.color
         ctx.globalAlpha = 0.75
-        ctx.font        = '9px sans-serif'
+        ctx.font        = '9px Tahoma, Verdana, sans-serif'
         ctx.textAlign   = 'right'
         ctx.fillText(zone.label, pad.left + cW - 3, midY + 3)
         ctx.globalAlpha = 1
@@ -166,7 +167,7 @@ export default function AlcoholCalculator() {
     })
 
     // Grid
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)'
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)'
     ctx.lineWidth = 1
     const yLines = [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0].filter(v => v <= dispMax)
     yLines.forEach(v => {
@@ -180,8 +181,8 @@ export default function AlcoholCalculator() {
     }
 
     // Axis labels
-    ctx.fillStyle = '#374151'
-    ctx.font = '11px sans-serif'
+    ctx.fillStyle = '#9aa1bf'
+    ctx.font = '11px Tahoma, Verdana, sans-serif'
     ctx.textAlign = 'right'
     yLines.forEach(v => {
       ctx.fillText(v.toFixed(1) + '‰', pad.left - 4, yS(v) + 4)
@@ -198,7 +199,7 @@ export default function AlcoholCalculator() {
     ctx.restore()
     ctx.textAlign = 'center'
     ctx.fillText('Time after first drink (h)', pad.left + cW / 2, H - 8)
-    ctx.strokeStyle = '#d1d5db'
+    ctx.strokeStyle = '#4a5274'
     ctx.lineWidth = 1
     ctx.strokeRect(pad.left, pad.top, cW, cH)
 
@@ -229,7 +230,7 @@ export default function AlcoholCalculator() {
       ctx.stroke()
       ctx.setLineDash([])
       ctx.fillStyle  = '#dc2626'
-      ctx.font       = '10px sans-serif'
+      ctx.font       = '10px Tahoma, Verdana, sans-serif'
       ctx.textAlign  = 'left'
       ctx.fillText(`Legal limit ${limitVal}‰ (${COUNTRIES[cntry].name.replace(/^\S+\s/, '')})`, pad.left + 4, yS(limitVal) - 4)
     }
@@ -244,7 +245,7 @@ export default function AlcoholCalculator() {
       ctx.stroke()
       ctx.setLineDash([])
       ctx.fillStyle  = '#f97316'
-      ctx.font       = '9px sans-serif'
+      ctx.font       = '9px Tahoma, Verdana, sans-serif'
       ctx.textAlign  = 'left'
       ctx.fillText('0.3‰ criminal threshold (DE accident)', pad.left + 4, yS(0.3) - 3)
     }
@@ -258,7 +259,7 @@ export default function AlcoholCalculator() {
       ctx.beginPath(); ctx.moveTo(sx, pad.top); ctx.lineTo(sx, pad.top + cH); ctx.stroke()
       ctx.setLineDash([])
       ctx.fillStyle  = '#16a34a'
-      ctx.font       = '10px sans-serif'
+      ctx.font       = '10px Tahoma, Verdana, sans-serif'
       ctx.textAlign  = 'center'
       ctx.fillText('Safe to drive', sx, pad.top + 12)
     }
@@ -272,7 +273,7 @@ export default function AlcoholCalculator() {
       ctx.beginPath(); ctx.moveTo(sx, pad.top); ctx.lineTo(sx, pad.top + cH); ctx.stroke()
       ctx.setLineDash([])
       ctx.fillStyle  = '#22c55e'
-      ctx.font       = '10px sans-serif'
+      ctx.font       = '10px Tahoma, Verdana, sans-serif'
       ctx.textAlign  = 'center'
       ctx.fillText('Sober', sx, pad.top + 22)
     }
@@ -280,7 +281,7 @@ export default function AlcoholCalculator() {
     // Steady state annotation
     if (m?.steadyState) {
       ctx.fillStyle  = '#f59e0b'
-      ctx.font       = '10px sans-serif'
+      ctx.font       = '10px Tahoma, Verdana, sans-serif'
       ctx.textAlign  = 'right'
       ctx.fillText('⚠ Approaching steady state', pad.left + cW - 4, pad.top + cH - 6)
     }
@@ -289,7 +290,7 @@ export default function AlcoholCalculator() {
     const uniqueTimes = [...new Set(drnks.map(d => d.timeh))].sort((a, b) => a - b)
     uniqueTimes.forEach(t => {
       if (t > maxT) return
-      ctx.font      = '12px sans-serif'
+      ctx.font      = '12px Tahoma, Verdana, sans-serif'
       ctx.textAlign = 'center'
       ctx.fillText('🍺', xS(t), pad.top + cH + 38)
     })
@@ -307,8 +308,8 @@ export default function AlcoholCalculator() {
     if (m && m.peakTime <= maxT) {
       ctx.fillStyle = '#ef4444'
       ctx.beginPath(); ctx.arc(xS(m.peakTime), yS(m.peakBAC), 5, 0, Math.PI * 2); ctx.fill()
-      ctx.fillStyle  = '#111827'
-      ctx.font       = 'bold 11px sans-serif'
+      ctx.fillStyle  = '#e8ebf7'
+      ctx.font       = 'bold 11px Tahoma, Verdana, sans-serif'
       ctx.textAlign  = 'center'
       ctx.fillText('Peak ' + m.peakBAC + '‰', xS(m.peakTime), yS(m.peakBAC) - 10)
     }
@@ -363,23 +364,18 @@ export default function AlcoholCalculator() {
   const totalUnits = totalEthanol / 10
 
   const btn = active => ({
-    padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px',
-    fontWeight: active ? '600' : '400',
-    border: active ? '2px solid #2a6fdb' : '1px solid rgba(255,255,255,0.1)',
-    background: active ? 'rgba(42,111,219,0.18)' : 'rgba(255,255,255,0.04)',
-    color: active ? '#93b4f7' : 'rgba(240,244,255,0.65)',
+    padding: '4px 12px', cursor: 'pointer', fontSize: '13.5px', minHeight: '24px',
   })
 
   return (
-    <main style={{ maxWidth: '980px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <a href="/harm-reduction" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', textDecoration: 'none' }}>← Harm reduction</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px' }}>Alcohol Calculator</h1>
-      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
+    <main className="xp-desktop">
+      <Window title="Alcohol calculator" icon="substance:alcohol" closeHref="/harm-reduction" status={['Widmark model', 'Runs on your device. Nothing you enter is sent anywhere.']}>
+      <p className="xp-intro">
         Based on the Widmark model — the forensic pharmacokinetic standard. The shaded band shows the range between slow and fast ethanol eliminators. Individual variation is real and significant.
       </p>
 
-      <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '8px', padding: '10px 14px', marginBottom: '1.25rem', fontSize: '12px', color: '#fdba74' }}>
-        ⚠ <strong>Never drink and drive.</strong> This tool models population averages — your actual BAC may be higher or lower. Do not use this to decide whether you are safe to drive. When in doubt, don't drive.
+      <div className="xp-alert xp-alert-warn" style={{ marginBottom: '1.25rem', fontSize: '13.5px' }}>
+        <strong>Never drink and drive.</strong> This tool models population averages — your actual BAC may be higher or lower. Do not use this to decide whether you are safe to drive. When in doubt, don't drive.
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: '1.5rem' }}>
@@ -388,49 +384,49 @@ export default function AlcoholCalculator() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {/* Personal details */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Personal details</p>
+          <div className="xp-group">
+            <p className="xp-legend">Personal details</p>
 
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Biological sex</label>
+              <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Biological sex</label>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button onClick={() => setSex('male')}   style={btn(sex === 'male')}>Male (r = 0.68)</button>
-                <button onClick={() => setSex('female')} style={btn(sex === 'female')}>Female (r = 0.55)</button>
+                <button onClick={() => setSex('male')}   style={btn(sex === 'male')} aria-pressed={Boolean(sex === 'male')}>Male (r = 0.68)</button>
+                <button onClick={() => setSex('female')} style={btn(sex === 'female')} aria-pressed={Boolean(sex === 'female')}>Female (r = 0.55)</button>
               </div>
             </div>
 
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
+              <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <input type="number" value={rawWeight} min={30} max={200}
                   onChange={e => { setRawWeight(e.target.value); const n = parseFloat(e.target.value); if (n >= 30 && n <= 200) setWeightKg(n) }}
                   onBlur={() => { const n = parseFloat(rawWeight); if (isNaN(n) || n < 30 || n > 200) { setWeightKg(75); setRawWeight('75') } }}
-                  style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: '#0f1629' }} />
-                <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>kg</span>
+                  style={{ width: '60px', padding: '4px 8px', borderRadius: '2px', border: '1px solid var(--xp-etch)', fontSize: '15.5px', fontWeight: '600', color: 'var(--xp-text)', textAlign: 'right', background: 'var(--xp-face-2)' }} />
+                <span style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)' }}>kg</span>
                 <input type="range" min={30} max={200} step={1} value={weightKg}
                   onChange={e => { setWeightKg(parseInt(e.target.value)); setRawWeight(e.target.value) }}
-                  style={{ flex: 1, accentColor: '#2a6fdb' }} />
+                  style={{ flex: 1, accentColor: '#2fb34a' }} />
               </div>
             </div>
 
             <div>
-              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Stomach contents</label>
+              <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Stomach contents</label>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button onClick={() => setWithFood(false)} style={btn(!withFood)}>Empty stomach</button>
-                <button onClick={() => setWithFood(true)}  style={btn(withFood)}>With food (~30% lower peak)</button>
+                <button onClick={() => setWithFood(false)} style={btn(!withFood)} aria-pressed={Boolean(!withFood)}>Empty stomach</button>
+                <button onClick={() => setWithFood(true)}  style={btn(withFood)} aria-pressed={Boolean(withFood)}>With food (~30% lower peak)</button>
               </div>
             </div>
           </div>
 
           {/* Country + driver type */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Driving limits</p>
+          <div className="xp-group">
+            <p className="xp-legend">Driving limits</p>
 
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Country</label>
+              <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Country</label>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {Object.entries(COUNTRIES).map(([k, v]) => (
-                  <button key={k} onClick={() => { setCountry(k); setDriverType('standard') }} style={btn(country === k)}>
+                  <button key={k} onClick={() => { setCountry(k); setDriverType('standard') }} style={btn(country === k)} aria-pressed={Boolean(country === k)}>
                     {v.name}
                   </button>
                 ))}
@@ -438,36 +434,36 @@ export default function AlcoholCalculator() {
             </div>
 
             <div>
-              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Driver type</label>
+              <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Driver type</label>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 <button onClick={() => setDriverType('standard')}
-                  style={btn(driverType === 'standard')}>
+                  style={btn(driverType === 'standard')} aria-pressed={Boolean(driverType === 'standard')}>
                   Standard ({COUNTRIES[country].standard}‰)
                 </button>
                 <button onClick={() => setDriverType('novice')}
-                  style={btn(driverType === 'novice')}>
+                  style={btn(driverType === 'novice')} aria-pressed={Boolean(driverType === 'novice')}>
                   {COUNTRIES[country].noviceLabel} ({COUNTRIES[country].novice}‰)
                 </button>
                 <button onClick={() => setDriverType('professional')}
-                  style={btn(driverType === 'professional')}>
+                  style={btn(driverType === 'professional')} aria-pressed={Boolean(driverType === 'professional')}>
                   {COUNTRIES[country].proLabel} ({COUNTRIES[country].professional}‰)
                 </button>
                 <button onClick={() => setDriverType('none')}
-                  style={btn(driverType === 'none')}>
+                  style={btn(driverType === 'none')} aria-pressed={Boolean(driverType === 'none')}>
                   Not driving
                 </button>
               </div>
 
               {/* Germany criminal threshold note */}
               {COUNTRIES[country].note && driverType !== 'none' && (
-                <div style={{ marginTop: '8px', padding: '7px 10px', background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '6px', fontSize: '11px', color: '#fdba74' }}>
+                <div className="xp-alert xp-alert-warn" style={{ marginTop: '8px', fontSize: '12.5px' }}>
                   ⚠ {COUNTRIES[country].note}
                 </div>
               )}
 
               {/* Not driving confirmation */}
               {driverType === 'none' && (
-                <div style={{ marginTop: '8px', padding: '7px 10px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '11px', color: '#15803d' }}>
+                <div className="xp-alert xp-alert-ok" style={{ marginTop: '8px', fontSize: '12.5px' }}>
                   ✓ Not driving selected — no legal limit line shown.
                 </div>
               )}
@@ -475,8 +471,8 @@ export default function AlcoholCalculator() {
           </div>
 
           {/* Drinks */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Drinks</p>
+          <div className="xp-group">
+            <p className="xp-legend">Drinks</p>
 
             {drinks.map((d, idx) => {
               const volumes  = DRINK_VOLUMES[d.category] ?? DRINK_VOLUMES['Mixed']
@@ -486,23 +482,23 @@ export default function AlcoholCalculator() {
               const eg       = calcEthanolGrams(vol, abv / 100)
 
               return (
-                <div key={d.id} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
+                <div key={d.id} style={{ background: 'var(--xp-face-2)', border: '1px solid var(--xp-etch)', borderRadius: '3px', padding: '10px 12px', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>Drink {idx + 1}</span>
+                    <span style={{ fontSize: '13.5px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>Drink {idx + 1}</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)' }}>{eg.toFixed(1)}g ethanol / {(eg/10).toFixed(2)} units</span>
+                      <span style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)' }}>{eg.toFixed(1)}g ethanol / {(eg/10).toFixed(2)} units</span>
                       {drinks.length > 1 && (
                         <button onClick={() => removeDrink(d.id)}
-                          style={{ fontSize: '18px', color: 'rgba(240,244,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
+                          style={{ fontSize: '18px', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
                       )}
                     </div>
                   </div>
 
                   {/* Type */}
                   <div style={{ marginBottom: '6px' }}>
-                    <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>Type</label>
+                    <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>Type</label>
                     <select value={d.typeId} onChange={e => updateDrink(d.id, 'typeId', e.target.value)}
-                      style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#f0f4ff', background: '#0f1629' }}>
+                      style={{ width: '100%', padding: '6px 8px', borderRadius: '2px', border: '1px solid var(--xp-etch)', fontSize: '13.5px', color: 'var(--xp-text)', background: 'var(--xp-face-2)' }}>
                       {CATEGORIES.map(cat => (
                         <optgroup key={cat} label={cat}>
                           {DRINK_TYPES.filter(t => t.category === cat).map(t => (
@@ -516,43 +512,43 @@ export default function AlcoholCalculator() {
                   {isCustom ? (
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginBottom: '6px' }}>
                       <div>
-                        <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>Volume (mL)</label>
+                        <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>Volume (mL)</label>
                         <input type="number" value={d.customVolume} min={10} max={2000}
                           onChange={e => updateDrink(d.id, 'customVolume', parseFloat(e.target.value) || 250)}
-                          style={{ width: '100%', padding: '5px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '13px', boxSizing: 'border-box' }} />
+                          style={{ width: '100%', padding: '5px 8px', borderRadius: '2px', border: '1px solid var(--xp-etch)', fontSize: '14.5px', boxSizing: 'border-box' }} />
                       </div>
                       <div>
-                        <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>ABV (%)</label>
+                        <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>ABV (%)</label>
                         <input type="number" value={d.customAbv} min={0.1} max={96} step={0.1}
                           onChange={e => updateDrink(d.id, 'customAbv', parseFloat(e.target.value) || 5)}
-                          style={{ width: '100%', padding: '5px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '13px', boxSizing: 'border-box' }} />
+                          style={{ width: '100%', padding: '5px 8px', borderRadius: '2px', border: '1px solid var(--xp-etch)', fontSize: '14.5px', boxSizing: 'border-box' }} />
                       </div>
                     </div>
                   ) : (
                     <div style={{ marginBottom: '6px' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 64px', gap: '6px', marginBottom: '6px' }}>
                         <div>
-                          <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>Volume</label>
+                          <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>Volume</label>
                           <select value={d.volumeMl} onChange={e => updateDrink(d.id, 'volumeMl', parseInt(e.target.value))}
-                            style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#f0f4ff', background: '#0f1629' }}>
+                            style={{ width: '100%', padding: '6px 8px', borderRadius: '2px', border: '1px solid var(--xp-etch)', fontSize: '13.5px', color: 'var(--xp-text)', background: 'var(--xp-face-2)' }}>
                             {volumes.map(v => (
                               <option key={v.label} value={v.ml}>{v.label}</option>
                             ))}
                           </select>
                         </div>
                         <div>
-                          <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>Qty</label>
+                          <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>Qty</label>
                           <select value={d.qty} onChange={e => updateDrink(d.id, 'qty', parseInt(e.target.value))}
-                            style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', color: '#f0f4ff', background: '#0f1629' }}>
+                            style={{ width: '100%', padding: '6px 8px', borderRadius: '2px', border: '1px solid var(--xp-etch)', fontSize: '13.5px', color: 'var(--xp-text)', background: 'var(--xp-face-2)' }}>
                             {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
                           </select>
                         </div>
                       </div>
-                      <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>ABV: {d.abv.toFixed(1)}%</label>
+                      <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>ABV: {d.abv.toFixed(1)}%</label>
                       <input type="range" min={0.5} max={70} step={0.5} value={d.abv}
                         onChange={e => updateDrink(d.id, 'abv', parseFloat(e.target.value))}
-                        style={{ width: '100%', accentColor: '#2a6fdb' }} />
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
+                        style={{ width: '100%', accentColor: '#2fb34a' }} />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', color: '#6d7494' }}>
                         <span>0.5%</span><span>70%</span>
                       </div>
                     </div>
@@ -560,13 +556,13 @@ export default function AlcoholCalculator() {
 
                   {/* Timing */}
                   <div>
-                    <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
+                    <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>
                       Time: {d.timeh === 0 ? 'Start (t=0)' : `+${d.timeh}h after start`}
                     </label>
                     <input type="range" min={0} max={12} step={0.25} value={d.timeh}
                       onChange={e => updateDrink(d.id, 'timeh', parseFloat(e.target.value))}
-                      style={{ width: '100%', accentColor: '#2a6fdb' }} />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
+                      style={{ width: '100%', accentColor: '#2fb34a' }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', color: '#6d7494' }}>
                       <span>Start</span><span>+12h</span>
                     </div>
                   </div>
@@ -575,11 +571,11 @@ export default function AlcoholCalculator() {
             })}
 
             <button onClick={addDrink}
-              style={{ width: '100%', padding: '8px', border: '1px dashed rgba(255,255,255,0.15)', borderRadius: '8px', background: 'transparent', fontSize: '13px', color: 'rgba(240,244,255,0.45)', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '8px', fontSize: '14.5px', cursor: 'pointer' }}>
               + Add another drink
             </button>
 
-            <div style={{ marginTop: '10px', padding: '8px 12px', background: '#0f1629', borderRadius: '8px', fontSize: '12px', color: 'rgba(240,244,255,0.75)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="xp-group" style={{ marginTop: '10px', fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', padding: '12px 14px' }}>
               Total: <strong>{totalEthanol.toFixed(1)}g ethanol</strong> — <strong>{totalUnits.toFixed(1)}</strong> Dutch units (1 unit = 10g)
             </div>
           </div>
@@ -591,18 +587,18 @@ export default function AlcoholCalculator() {
           {/* Canvas */}
           <div style={{ position: 'relative', width: '100%', height: '360px' }}>
             <canvas ref={canvasRef}
-              style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: '#0f1629' }} />
+              className="xp-well" style={{ width: '100%', height: '100%' }} />
           </div>
 
           {/* Graph controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: 'rgba(240,244,255,0.3)', whiteSpace: 'nowrap' }}>SHOW</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13.5px' }}>
+            <span style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--xp-text-dim)', whiteSpace: 'nowrap' }}>SHOW</span>
             <input type="range" min={4} max={24} step={1} value={timeScale}
               onChange={e => setTimeScale(parseInt(e.target.value))}
-              style={{ flex: 1, accentColor: '#2a6fdb' }} />
+              style={{ flex: 1, accentColor: '#2fb34a' }} />
             <span style={{ fontWeight: '600', color: 'rgba(240,244,255,0.75)', minWidth: '28px' }}>{timeScale}h</span>
             <button onClick={exportGraph}
-              style={{ padding: '5px 12px', background: '#2a6fdb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              style={{ padding: '5px 12px', fontSize: '12.5px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               ↓ Export PNG
             </button>
           </div>
@@ -610,7 +606,7 @@ export default function AlcoholCalculator() {
           {/* Zone legend */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
             {BAC_ZONES.slice(0, 6).map(z => (
-              <span key={z.label} style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '999px', background: z.color + '22', color: z.color, border: `1px solid ${z.color}44` }}>
+              <span key={z.label} style={{ fontSize: '11.5px', padding: '2px 8px', borderRadius: '2px', background: z.color + '22', color: z.color, border: `1px solid ${z.color}44` }}>
                 {z.min}–{z.max === 10 ? '3.0+' : z.max}‰ {z.label}
               </span>
             ))}
@@ -652,20 +648,20 @@ export default function AlcoholCalculator() {
                   label: 'Widmark peak (max)',
                   value: metrics.widmarkPeak + '‰',
                   sub:   'Theoretical max — instantaneous absorption',
-                  color: 'rgba(240,244,255,0.45)',
+                  color: 'var(--xp-text-dim)',
                 },
               ].map(m => (
-                <div key={m.label} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
-                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '2px' }}>{m.label}</div>
+                <div key={m.label} style={{ background: 'var(--xp-face-2)', border: '1px solid var(--xp-etch)', borderRadius: '3px', padding: '10px 12px' }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', marginBottom: '2px' }}>{m.label}</div>
                   <div style={{ fontSize: '17px', fontWeight: '700', color: m.color ?? '#f0f4ff' }}>{m.value}</div>
-                  {m.sub && <div style={{ fontSize: '10px', color: m.color ?? 'rgba(240,244,255,0.35)' }}>{m.sub}</div>}
+                  {m.sub && <div style={{ fontSize: '11.5px', color: m.color ?? 'rgba(240,244,255,0.35)' }}>{m.sub}</div>}
                 </div>
               ))}
             </div>
           )}
 
           {/* PK education note */}
-          <div style={{ background: 'rgba(42,111,219,0.15)', border: '1px solid rgba(42,111,219,0.35)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#93b4f7' }}>
+          <div className="xp-alert xp-alert-info" style={{ fontSize: '13.5px' }}>
             <p style={{ margin: '0 0 8px' }}>
               <strong>Why water doesn't speed sobering up:</strong> Ethanol elimination is enzyme-limited — alcohol dehydrogenase works at maximum capacity at typical BAC levels (zero-order / Michaelis-Menten saturation). Water hydrates you and reduces nausea but does not increase elimination rate. Only time sobers you up. This is the same MM kinetics shown in the PK calculator.
             </p>
@@ -676,17 +672,18 @@ export default function AlcoholCalculator() {
 
           {/* Steady state warning */}
           {metrics?.steadyState && (
-            <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#fdba74' }}>
-              ⚠ <strong>Steady state approaching</strong> — your drinking rate is close to your elimination rate. BAC will plateau rather than fall. Adding more drinks will continue to raise BAC. This is how people unknowingly drink to dangerous levels over long sessions.
+            <div className="xp-alert xp-alert-warn" style={{ fontSize: '13.5px' }}>
+              <strong>Steady state approaching</strong> — your drinking rate is close to your elimination rate. BAC will plateau rather than fall. Adding more drinks will continue to raise BAC. This is how people unknowingly drink to dangerous levels over long sessions.
             </div>
           )}
 
           {/* Support footer */}
-          <div style={{ padding: '10px 14px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>
+          <div className="xp-group" style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)', padding: '12px 14px' }}>
             Concerned about alcohol use? <a href="https://www.jellinek.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#2a6fdb' }}>Jellinek.nl</a> and <a href="https://www.trimbos.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#2a6fdb' }}>Trimbos.nl</a> offer free, confidential support.
           </div>
         </div>
       </div>
+      </Window>
     </main>
   )
 }

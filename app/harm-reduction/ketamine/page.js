@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import Window from '@/app/components/Window'
 import {
   KETAMINE_PK, KETAMINE_ZONES, KETAMINE_INTERACTIONS,
   simulateKetamine, calcKetamineMetrics,
@@ -81,7 +82,7 @@ export default function KetamineCalculator() {
     const maxT    = ts
 
     ctx.clearRect(0, 0, W, H)
-    ctx.fillStyle = 'white'
+    ctx.fillStyle = '#11141f'
     ctx.fillRect(0, 0, W, H)
 
     const xS = t => pad.left + (Math.min(t, maxT) / maxT) * cW
@@ -98,14 +99,14 @@ export default function KetamineCalculator() {
       const midY = (Math.max(y0, pad.top) + Math.min(y1, pad.top + cH)) / 2
       if (Math.min(y1, pad.top + cH) - Math.max(y0, pad.top) > 14) {
         ctx.fillStyle = zone.color; ctx.globalAlpha = 0.75
-        ctx.font = '9px sans-serif'; ctx.textAlign = 'right'
+        ctx.font = '9px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'right'
         ctx.fillText(zone.label, pad.left + cW - 3, midY + 3)
         ctx.globalAlpha = 1
       }
     })
 
     // Grid
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)'; ctx.lineWidth = 1
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1
     const yStep  = dispMax <= 400 ? 100 : 200
     const yLines = Array.from({ length: Math.floor(dispMax / yStep) + 1 }, (_, i) => i * yStep).filter(v => v <= dispMax)
     yLines.forEach(v => {
@@ -118,7 +119,7 @@ export default function KetamineCalculator() {
     }
 
     // Axis labels
-    ctx.fillStyle = '#374151'; ctx.font = '11px sans-serif'
+    ctx.fillStyle = '#9aa1bf'; ctx.font = '11px Tahoma, Verdana, sans-serif'
     ctx.textAlign = 'right'
     yLines.forEach(v => ctx.fillText(v + ' ng/mL', pad.left - 4, yS(v) + 4))
     ctx.textAlign = 'center'
@@ -128,12 +129,12 @@ export default function KetamineCalculator() {
     ctx.save()
     ctx.translate(12, pad.top + cH / 2)
     ctx.rotate(-Math.PI / 2)
-    ctx.textAlign = 'center'; ctx.font = '10px sans-serif'; ctx.fillStyle = '#9ca3af'
+    ctx.textAlign = 'center'; ctx.font = '10px Tahoma, Verdana, sans-serif'; ctx.fillStyle = '#9ca3af'
     ctx.fillText('Ketamine plasma (ng/mL)', 0, 0)
     ctx.restore()
-    ctx.textAlign = 'center'; ctx.fillStyle = '#374151'; ctx.font = '11px sans-serif'
+    ctx.textAlign = 'center'; ctx.fillStyle = '#9aa1bf'; ctx.font = '11px Tahoma, Verdana, sans-serif'
     ctx.fillText('Time after first dose (h)', pad.left + cW / 2, H - 8)
-    ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1
+    ctx.strokeStyle = '#4a5274'; ctx.lineWidth = 1
     ctx.strokeRect(pad.left, pad.top, cW, cH)
 
     // Dose markers
@@ -145,9 +146,9 @@ export default function KetamineCalculator() {
         ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + cH); ctx.stroke()
         ctx.setLineDash([])
       }
-      ctx.font = '12px sans-serif'; ctx.textAlign = 'center'
+      ctx.font = '12px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'
       ctx.fillText(d.route === 'intranasal' ? '👃' : '💊', x, pad.top + cH + 40)
-      ctx.fillStyle = '#6b7280'; ctx.font = '9px sans-serif'
+      ctx.fillStyle = '#6b7280'; ctx.font = '9px Tahoma, Verdana, sans-serif'
       ctx.fillText(d.timeh === 0 ? 't=0' : '+' + d.timeh + 'h', x, pad.top + cH + 50)
     })
 
@@ -162,7 +163,7 @@ export default function KetamineCalculator() {
     if (m && m.tmax <= maxT) {
       ctx.fillStyle = '#6366f1'
       ctx.beginPath(); ctx.arc(xS(m.tmax), yS(m.cmax), 5, 0, Math.PI * 2); ctx.fill()
-      ctx.fillStyle = '#111827'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'
+      ctx.fillStyle = '#e8ebf7'; ctx.font = 'bold 11px Tahoma, Verdana, sans-serif'; ctx.textAlign = 'center'
       ctx.fillText('Peak ' + m.cmax + ' ng/mL', xS(m.tmax), yS(m.cmax) - 10)
     }
   }
@@ -189,28 +190,22 @@ export default function KetamineCalculator() {
   }
 
   const btn = (active) => ({
-    padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px',
-    fontWeight: active ? '600' : '400',
-    border: active ? '2px solid #6366f1' : '1px solid #d1d5db',
-    background: active ? 'rgba(99,102,241,0.18)' : 'rgba(255,255,255,0.05)',
-    color: active ? '#c7d2fe' : 'rgba(240,244,255,0.65)',
+    padding: '4px 12px', cursor: 'pointer', fontSize: '13.5px', minHeight: '24px',
   })
 
   return (
-    <main style={{ maxWidth: '980px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; }`}</style>
-      <a href="/harm-reduction" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none' }}>← Harm reduction</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px' }}>Ketamine Pharmacokinetics</h1>
-      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
+    <main className="xp-desktop">
+      <Window title="Ketamine pharmacokinetics" icon="substance:ketamine" closeHref="/harm-reduction" status={['2-compartment intranasal model', 'Runs on your device. Nothing you enter is sent anywhere.']}>
+      <p className="xp-intro">
         Plasma concentration model for intranasal and oral ketamine. Unique among recreational drugs — also used clinically for treatment-resistant depression and anaesthesia at higher doses.
       </p>
 
       {/* Bladder warning — most important chronic harm */}
-      <div style={{ background: 'rgba(185,28,28,0.2)', border: '2px solid rgba(239,68,68,0.6)', borderRadius: '10px', padding: '12px 16px', marginBottom: '12px', fontSize: '13px', color: '#fca5a5' }}>
-        <strong>⚠ Ketamine-induced uropathy — the most important chronic harm.</strong> Regular ketamine use causes progressive, irreversible bladder damage. Ketamine cystitis presents as severe bladder pain, urinary frequency, and reduced bladder capacity. In severe cases, bladder removal has been required. This is not a dose-dependent acute risk but a chronic use risk — it can develop within months of regular use. There is no safe frequency established. Any sign of urinary symptoms in a ketamine user requires immediate medical attention.
+      <div className="xp-alert xp-alert-error" style={{ marginBottom: '12px', fontSize: '14.5px' }}>
+        <strong>Ketamine-induced uropathy — the most important chronic harm.</strong> Regular ketamine use causes progressive, irreversible bladder damage. Ketamine cystitis presents as severe bladder pain, urinary frequency, and reduced bladder capacity. In severe cases, bladder removal has been required. This is not a dose-dependent acute risk but a chronic use risk — it can develop within months of regular use. There is no safe frequency established. Any sign of urinary symptoms in a ketamine user requires immediate medical attention.
       </div>
 
-      <div style={{ background: 'rgba(120,53,15,0.25)', border: '1px solid rgba(249,115,22,0.5)', borderRadius: '10px', padding: '10px 14px', marginBottom: '1.5rem', fontSize: '12px', color: '#fdba74' }}>
+      <div className="xp-alert xp-alert-warn" style={{ marginBottom: '1.5rem', fontSize: '13.5px' }}>
         Population-average PK model. Ketamine is a racemic mixture (R and S enantiomers) with different potencies — clinical esketamine (S-ketamine, Spravato) is approximately 2× more potent at the same plasma concentration. Street ketamine is racemic. Individual CYP3A4 variation affects clearance.
       </div>
 
@@ -220,51 +215,51 @@ export default function KetamineCalculator() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {/* Personal */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Personal details</p>
-            <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
+          <div className="xp-group">
+            <p className="xp-legend">Personal details</p>
+            <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <input type="number" value={rawWeight} min={40} max={150}
                 onChange={e => { setRawWeight(e.target.value); const n = parseFloat(e.target.value); if (n >= 40 && n <= 150) setWeightKg(n) }}
                 onBlur={() => { const n = parseFloat(rawWeight); if (isNaN(n) || n < 40 || n > 150) { setWeightKg(70); setRawWeight('70') } }}
-                style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: 'rgba(255,255,255,0.04)' }} />
-              <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>kg</span>
+                style={{ width: '60px', padding: '4px 8px', borderRadius: '2px', border: '1px solid var(--xp-etch)', fontSize: '15.5px', fontWeight: '600', color: 'var(--xp-text)', textAlign: 'right', background: 'var(--xp-face-2)' }} />
+              <span style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)' }}>kg</span>
               <input type="range" min={40} max={150} step={1} value={weightKg}
                 onChange={e => { setWeightKg(parseInt(e.target.value)); setRawWeight(e.target.value) }}
-                style={{ flex: 1, accentColor: '#6366f1' }} />
+                style={{ flex: 1, accentColor: '#2fb34a' }} />
             </div>
           </div>
 
           {/* Doses */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dose schedule</p>
+          <div className="xp-group">
+            <p className="xp-legend">Dose schedule</p>
 
             {doses.map((d, idx) => (
-              <div key={d.id} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
+              <div key={d.id} style={{ background: 'var(--xp-face-2)', border: '1px solid var(--xp-etch)', borderRadius: '3px', padding: '10px 12px', marginBottom: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>
+                  <span style={{ fontSize: '13.5px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>
                     {idx === 0 ? 'First dose' : `Dose ${idx + 1}`}
-                    <span style={{ marginLeft: '6px', fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '400' }}>
+                    <span style={{ marginLeft: '6px', fontSize: '12.5px', color: 'var(--xp-text-dim)', fontWeight: '400' }}>
                       {d.route === 'intranasal' ? '👃 intranasal' : '💊 oral'}
                     </span>
                   </span>
                   {doses.length > 1 && (
                     <button onClick={() => removeDose(d.id)}
-                      style={{ fontSize: '18px', color: 'rgba(240,244,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
+                      style={{ fontSize: '18px', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
                   )}
                 </div>
 
                 {/* Route toggle */}
                 <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
-                  <button onClick={() => updateDose(d.id, 'route', 'intranasal')} style={btn(d.route === 'intranasal')}>👃 Intranasal</button>
-                  <button onClick={() => updateDose(d.id, 'route', 'oral')}       style={btn(d.route === 'oral')}>💊 Oral</button>
+                  <button onClick={() => updateDose(d.id, 'route', 'intranasal')} style={btn(d.route === 'intranasal')} aria-pressed={Boolean(d.route === 'intranasal')}>👃 Intranasal</button>
+                  <button onClick={() => updateDose(d.id, 'route', 'oral')}       style={btn(d.route === 'oral')} aria-pressed={Boolean(d.route === 'oral')}>💊 Oral</button>
                 </div>
 
                 {/* Dose */}
                 <div style={{ marginBottom: idx === 0 ? 0 : '8px' }}>
-                  <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
+                  <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>
                     Amount: {d.doseMg}mg
-                    <span style={{ color: 'rgba(240,244,255,0.3)', marginLeft: '4px' }}>
+                    <span style={{ color: 'var(--xp-text-dim)', marginLeft: '4px' }}>
                       {d.route === 'intranasal'
                         ? '(typical recreational line ~30–100mg)'
                         : '(oral requires ~3× higher dose for similar effect)'}
@@ -272,8 +267,8 @@ export default function KetamineCalculator() {
                   </label>
                   <input type="range" min={10} max={300} step={5} value={d.doseMg}
                     onChange={e => updateDose(d.id, 'doseMg', parseInt(e.target.value))}
-                    style={{ width: '100%', accentColor: '#6366f1' }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
+                    style={{ width: '100%', accentColor: '#2fb34a' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', color: '#6d7494' }}>
                     <span>10mg</span><span>300mg</span>
                   </div>
                 </div>
@@ -281,17 +276,17 @@ export default function KetamineCalculator() {
                 {/* Timing */}
                 {idx > 0 && (
                   <div>
-                    <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
+                    <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>
                       +{d.timeh}h after first dose
                     </label>
                     <input type="range" min={0.25} max={10} step={0.25} value={d.timeh}
                       onChange={e => updateDose(d.id, 'timeh', parseFloat(e.target.value))}
-                      style={{ width: '100%', accentColor: '#6366f1' }} />
+                      style={{ width: '100%', accentColor: '#2fb34a' }} />
                   </div>
                 )}
 
                 {d.doseMg >= 200 && (
-                  <div style={{ marginTop: '6px', padding: '5px 8px', background: 'rgba(185,28,28,0.2)', border: '1px solid rgba(239,68,68,0.5)', borderRadius: '6px', fontSize: '10px', color: '#fca5a5' }}>
+                  <div className="xp-alert xp-alert-error" style={{ marginTop: '6px', fontSize: '11.5px' }}>
                     ⚠ High dose — anaesthetic dissociation range. Loss of bodily control, unable to communicate or move.
                   </div>
                 )}
@@ -300,18 +295,18 @@ export default function KetamineCalculator() {
 
             <div style={{ display: 'flex', gap: '6px' }}>
               <button onClick={() => addDose('intranasal')}
-                style={{ flex: 1, padding: '8px', border: '1px dashed rgba(99,102,241,0.4)', borderRadius: '8px', background: 'transparent', fontSize: '12px', color: '#a5b4fc', cursor: 'pointer' }}>
+                style={{ flex: 1, padding: '8px', fontSize: '13.5px', cursor: 'pointer' }}>
                 + Add intranasal dose
               </button>
               <button onClick={() => addDose('oral')}
-                style={{ flex: 1, padding: '8px', border: '1px dashed #d1d5db', borderRadius: '8px', background: 'transparent', fontSize: '12px', color: 'rgba(240,244,255,0.45)', cursor: 'pointer' }}>
+                style={{ flex: 1, padding: '8px', fontSize: '13.5px', cursor: 'pointer' }}>
                 + Add oral dose
               </button>
             </div>
 
-            <div style={{ marginTop: '10px', padding: '8px 12px', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.35)', borderRadius: '8px', fontSize: '12px', color: '#c7d2fe' }}>
+            <div className="xp-alert xp-alert-info" style={{ marginTop: '10px', fontSize: '13.5px' }}>
               Total: <strong>{totalDose}mg</strong>
-              <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginLeft: '6px' }}>
+              <span style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', marginLeft: '6px' }}>
                 ({(totalDose / weightKg).toFixed(2)} mg/kg)
               </span>
             </div>
@@ -324,18 +319,18 @@ export default function KetamineCalculator() {
           {/* Canvas */}
           <div style={{ position: 'relative', width: '100%', height: '360px' }}>
             <canvas ref={canvasRef}
-              style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }} />
+              className="xp-well" style={{ width: '100%', height: '100%' }} />
           </div>
 
           {/* Graph controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: 'rgba(240,244,255,0.3)', whiteSpace: 'nowrap' }}>SHOW</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13.5px' }}>
+            <span style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--xp-text-dim)', whiteSpace: 'nowrap' }}>SHOW</span>
             <input type="range" min={2} max={16} step={1} value={timeScale}
               onChange={e => setTimeScale(parseInt(e.target.value))}
-              style={{ flex: 1, accentColor: '#6366f1' }} />
+              style={{ flex: 1, accentColor: '#2fb34a' }} />
             <span style={{ fontWeight: '600', color: 'rgba(240,244,255,0.75)', minWidth: '28px' }}>{timeScale}h</span>
             <button onClick={exportGraph}
-              style={{ padding: '5px 12px', background: '#2a6fdb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              style={{ padding: '5px 12px', fontSize: '12.5px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               ↓ Export PNG
             </button>
           </div>
@@ -343,7 +338,7 @@ export default function KetamineCalculator() {
           {/* Zone legend */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
             {KETAMINE_ZONES.map(z => (
-              <span key={z.label} style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '999px', background: z.color + '22', color: z.color, border: `1px solid ${z.color}44` }}>
+              <span key={z.label} style={{ fontSize: '11.5px', padding: '2px 8px', borderRadius: '2px', background: z.color + '22', color: z.color, border: `1px solid ${z.color}44` }}>
                 {z.min}–{z.max === 99999 ? '400+' : z.max} ng/mL {z.label}
               </span>
             ))}
@@ -358,17 +353,17 @@ export default function KetamineCalculator() {
                 { label: 'Sub-threshold at',    value: metrics.clearTime != null ? formatHours(metrics.clearTime) : '>12h', sub: 'below 40 ng/mL' },
                 { label: 'Total dose',          value: totalDose + 'mg', sub: (totalDose / weightKg).toFixed(2) + ' mg/kg' },
               ].map(m => (
-                <div key={m.label} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
-                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '2px' }}>{m.label}</div>
+                <div key={m.label} style={{ background: 'var(--xp-face-2)', border: '1px solid var(--xp-etch)', borderRadius: '3px', padding: '10px 12px' }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', marginBottom: '2px' }}>{m.label}</div>
                   <div style={{ fontSize: '17px', fontWeight: '700', color: m.color ?? '#f0f4ff' }}>{m.value}</div>
-                  {m.sub && <div style={{ fontSize: '10px', color: m.color ?? 'rgba(240,244,255,0.35)' }}>{m.sub}</div>}
+                  {m.sub && <div style={{ fontSize: '11.5px', color: m.color ?? 'rgba(240,244,255,0.35)' }}>{m.sub}</div>}
                 </div>
               ))}
             </div>
           )}
 
           {/* Clinical context note */}
-          <div style={{ background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.35)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#c7d2fe' }}>
+          <div className="xp-alert xp-alert-info" style={{ fontSize: '13.5px' }}>
             <p style={{ margin: '0 0 6px' }}>
               <strong>Clinical vs recreational context:</strong> Ketamine is a licensed anaesthetic and, as esketamine (Spravato), an antidepressant for treatment-resistant depression. Clinical IV anaesthetic doses are typically 1–2 mg/kg (70–140mg for 70kg). Recreational intranasal doses are typically 30–100mg. The k-hole starts to become possible above ~100mg intranasally for a non-tolerant user.
             </p>
@@ -378,25 +373,26 @@ export default function KetamineCalculator() {
           </div>
 
           {/* Interactions */}
-          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 10px' }}>Dangerous combinations</p>
+          <div className="xp-group" style={{ padding: '12px 14px' }}>
+            <p style={{ fontSize: '14.5px', fontWeight: '600', color: 'var(--xp-text)', margin: '0 0 10px' }}>Dangerous combinations</p>
             {KETAMINE_INTERACTIONS.map(inter => (
-              <div key={inter.substance} style={{ marginBottom: '8px', padding: '8px 10px', background: inter.color + '11', border: `1px solid ${inter.color}33`, borderRadius: '8px' }}>
+              <div key={inter.substance} style={{ marginBottom: '8px', padding: '8px 10px', background: inter.color + '11', border: `1px solid ${inter.color}33`, borderRadius: '3px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff' }}>{inter.substance}</span>
-                  <span style={{ fontSize: '10px', fontWeight: '600', padding: '1px 8px', borderRadius: '999px', background: inter.color, color: 'white' }}>{inter.severity}</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: '600', color: 'var(--xp-text)' }}>{inter.substance}</span>
+                  <span style={{ fontSize: '11.5px', fontWeight: '600', padding: '1px 8px', borderRadius: '2px', background: inter.color, color: 'white' }}>{inter.severity}</span>
                 </div>
-                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
+                <p style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
               </div>
             ))}
           </div>
 
           {/* Support */}
-          <div style={{ padding: '10px 14px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>
+          <div className="xp-group" style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)', padding: '12px 14px' }}>
             Concerned about ketamine use? <a href="https://www.jellinek.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#a5b4fc' }}>Jellinek.nl</a> and <a href="https://www.trimbos.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#a5b4fc' }}>Trimbos.nl</a> offer free, confidential support.
           </div>
         </div>
       </div>
+      </Window>
     </main>
   )
 }
