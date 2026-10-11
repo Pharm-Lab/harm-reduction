@@ -300,6 +300,9 @@ a.xp-cap:hover { filter: brightness(1.2); }
   .xp-window-body [style*="width: 380px"], .xp-window-body [style*="min-width"] { min-width: 0 !important; }
 }
 
+.xp-window-body ul:not([class]), .edu ul { list-style: disc; }
+.xp-window-body ol:not([class]), .info-src { list-style: decimal; }
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }

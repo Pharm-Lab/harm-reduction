@@ -4,18 +4,19 @@ import XpIcon from '@/app/components/XpIcon'
 import SubstanceIcon from '@/app/components/SubstanceIcon'
 
 const SUBSTANCES = [
-  { icon:'alcohol', title:'Alcohol',      desc:'BAC simulation using the Widmark model, adjusted for sex, weight and food.',                         href:'/harm-reduction/alcohol' },
-  { icon:'mdma', title:'MDMA',         desc:'Plasma model with CYP2D6 autoinhibition, serotonin risk zones and redosing.',                         href:'/harm-reduction/mdma' },
-  { icon:'cannabis', title:'Cannabis',     desc:'THC for smoked and oral routes, with the active metabolite 11-OH-THC tracked separately.',           href:'/harm-reduction/cannabis' },
-  { icon:'cocaine', title:'Cocaine',      desc:'Intranasal model, cocaethylene formation with alcohol, and cardiovascular risk zones.',              href:'/harm-reduction/cocaine' },
-  { icon:'amphetamines', title:'Amphetamines', desc:'Amphetamine and methamphetamine with pH-dependent elimination.',                                      href:'/harm-reduction/amphetamines' },
-  { icon:'ketamine', title:'Ketamine',     desc:'2-compartment intranasal model with dissociation and K-hole ranges.',                                 href:'/harm-reduction/ketamine' },
-  { icon:'cathinones', title:'Cathinones',   desc:'Mephedrone model with a wide uncertainty band, plus cards for other cathinones.',                     href:'/harm-reduction/cathinones' },
+  { icon:'alcohol',      title:'Alcohol',      tag:'PK-PD calculator', desc:'Watch your blood alcohol rise and fall over a night, with effects, driving limits and how your body clears it.', href:'/harm-reduction/alcohol' },
+  { icon:'mdma',         title:'MDMA',         tag:'Info page',        desc:'Pill strength, what else turns up in samples, overheating and risky combinations.', href:'/harm-reduction/mdma' },
+  { icon:'cannabis',     title:'Cannabis',     tag:'Info page',        desc:'Why edibles catch people out, and the mental health risks of frequent use.', href:'/harm-reduction/cannabis' },
+  { icon:'cocaine',      title:'Cocaine',      tag:'Info page',        desc:'Rising purity, what it is cut with, and why mixing with alcohol is riskier.', href:'/harm-reduction/cocaine' },
+  { icon:'amphetamines', title:'Amphetamines', tag:'Info page',        desc:'Why speed keeps you up so long, and what else is often in it.', href:'/harm-reduction/amphetamines' },
+  { icon:'ketamine',     title:'Ketamine',     tag:'Info page',        desc:'Bladder damage from regular use, addiction, and combinations to avoid.', href:'/harm-reduction/ketamine' },
+  { icon:'cathinones',   title:'Cathinones',   tag:'Info page',        desc:'Why "3-MMC" is almost never 3-MMC, with 2025 testing data from the Netherlands.', href:'/harm-reduction/cathinones' },
 ]
 
 const RESOURCES = [
   { icon:'interactions', title:'Interaction checker', desc:'How recreational and prescription drugs combine, and how dangerous each pairing is.', href:'/harm-reduction/interactions' },
   { icon:'guide', title:'PK graph guide',      desc:'What the curves mean in plain English: peak, half-life, and why you can still be high.', href:'/harm-reduction/guide' },
+  { icon:'guide', title:'Sources',             desc:'Every source behind the site, with what came from it and how it is used.', href:'/sources' },
 ]
 
 const SUPPORT = [
@@ -68,6 +69,8 @@ export default function HarmReductionPage() {
           border: 1px solid; border-color: var(--xp-lo) var(--xp-hi) var(--xp-hi) var(--xp-lo);
         }
         .ex-tile b { display: block; margin-bottom: 3px; font-size: 16px; }
+        .tag { display: inline-block; margin-left: 6px; padding: 0 6px; font-size: 11px; font-weight: normal; vertical-align: 2px; color: var(--xp-text-dim); border: 1px solid var(--xp-etch); border-radius: 2px; }
+        .tag-on { color: #fff; background: linear-gradient(180deg, #6a4ee6, #3f2a9e); border-color: #2a1a70; }
         .ex-tile span.d { display: block; font-size: 13px; line-height: 1.5; color: var(--xp-text-dim); }
         .ex-tile:hover span.d { color: #c9cde3; }
         .ex-tile.small .big { width: 44px; height: 44px; }
@@ -79,7 +82,7 @@ export default function HarmReductionPage() {
       `}</style>
 
       <Window
-        title="Calculators"
+        title="myClearance"
         icon="folder"
         closeHref={null}
         bodyStyle={{ padding: 0 }}
@@ -99,9 +102,9 @@ export default function HarmReductionPage() {
             <div className="ex-panel">
               <h2>Details</h2>
               <p>
-                These calculators model how drugs move through the body, using published clinical data.
-                They are educational tools, not medical advice. Accurate information reduces harm
-                more than abstinence messaging does.
+                The alcohol calculator models how alcohol moves through your body, using published data.
+                The other substances have information pages while their PK-PD tools are being built.
+                Everything here is educational, not medical advice.
               </p>
             </div>
             <div className="ex-panel">
@@ -111,12 +114,12 @@ export default function HarmReductionPage() {
           </aside>
 
           <div className="ex-main">
-            <h2 className="ex-group">Substance calculators</h2>
+            <h2 className="ex-group">Substances</h2>
             <div className="ex-tiles">
               {SUBSTANCES.map(s => (
                 <Link key={s.href} href={s.href} className="ex-tile">
                   <span className="big" aria-hidden="true"><SubstanceIcon name={s.icon} size={62} /></span>
-                  <span><b>{s.title}</b><span className="d">{s.desc}</span></span>
+                  <span><b>{s.title} <span className={s.tag.startsWith('PK') ? 'tag tag-on' : 'tag'}>{s.tag}</span></b><span className="d">{s.desc}</span></span>
                 </Link>
               ))}
             </div>

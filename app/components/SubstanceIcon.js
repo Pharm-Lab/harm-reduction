@@ -1,5 +1,5 @@
 // XP-style 48×48 icons for the substances and resources.
-// Glossy fills, dark outline, light from the top-left — drawn as SVG
+// Glossy fills, dark outline, light from the top-left, drawn as SVG
 // so they sit dead-centre in their box and look the same on every OS.
 
 const OUT = '#1a1426' // outline

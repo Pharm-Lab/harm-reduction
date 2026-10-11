@@ -2,96 +2,88 @@ import Window from '@/app/components/Window'
 export default function HarmReductionGuide() {
   const sections = [
     {
-      title: 'What is plasma concentration?',
+      title: 'What is on the graph?',
       emoji: '🩸',
-      content: `When you take a drug, it enters your bloodstream. Plasma concentration (measured in ng/mL — nanograms per millilitre) tells you how much drug is circulating in your blood at any given time. The curve on the graph shows this rising during absorption and falling during elimination.
+      content: `The line shows how much of a substance is in your blood over time. For alcohol that is your blood alcohol concentration (BAC), measured in promille (‰): roughly grams of alcohol per litre of blood. For other drugs it is usually given in nanograms per millilitre (ng/mL).
 
-This is a real, measurable number — not a feeling. Blood tests for drug driving use exactly these concentrations.`,
+This is a real, measurable number, not a feeling. A police blood test measures exactly this.`,
     },
     {
       title: "Why the curve doesn't equal how you feel",
       emoji: '🧠',
-      content: `The most important thing to understand: there is a delay between when drug enters your blood and when it reaches your brain. This is called the effect-site delay or ke0 lag.
+      content: `The graph shows pharmacokinetics: what your body does to the substance. How you feel is pharmacodynamics: what the substance does to you. The two are related but not the same.
 
-For most drugs this is 15–60 minutes. You might feel effects intensifying while plasma concentration is already dropping. You might feel effects fading while significant drug is still in your system.
-
-This is why the graph shows pharmacokinetics (what the body does to the drug) — not pharmacodynamics (what the drug does to you). The two are related but not identical.`,
+There is a delay between a substance reaching your blood and reaching your brain, and your brain adapts while it is there. So you can feel effects getting stronger while the level in your blood is already falling, and feel them fade while a lot is still in your system.`,
     },
     {
       title: 'The redosing trap',
       emoji: '🔄',
       highlight: 'red',
-      content: `The most dangerous misreading of a drug experience is: "I don't feel it anymore, so it must be gone."
+      content: `The most dangerous misreading of a night out is: "I don't feel it anymore, so it must be gone."
 
-Look at any curve on the calculators — particularly for drugs with long half-lives like MDMA (t½ ~8.5h) or amphetamines (t½ ~11h). Subjective effects often wear off well before plasma concentration returns to baseline. The drug is still in your system — it has just saturated or downregulated the receptors it acts on.
+Effects often fade long before a substance has left your body. MDMA has a half-life of 6 to 7 hours and amphetamine of roughly 4 to 12 hours, so a large part of the first dose is still there when the effect seems over.
 
-Redosing at this point doesn't give you the same experience again. It adds to the drug still present, pushing plasma concentration higher — into zones associated with toxicity rather than recreation. This is the pharmacological explanation for why "one more" at 4am feels different and more dangerous than the first dose.`,
+Taking more at that point does not reset the night. It stacks on top of what is still in your blood and pushes the level higher than the first dose ever did. That is why "one more" late at night carries more risk than the first.`,
     },
     {
       title: 'What the coloured zones mean',
       emoji: '🎨',
-      content: `The background colours on each graph represent effect or risk zones based on published data correlating plasma concentrations with observed effects.
+      content: `The coloured bands on the alcohol graph show what people typically experience at each blood alcohol level, from relaxed below 0.5‰ to a risk of coma above 4‰. They are indications for experienced drinkers.
 
-These are population averages. They come from studies of people who had blood drawn while under the influence and reported or showed certain effects at certain concentrations.
-
-Your individual experience may differ significantly based on:
-- Tolerance — regular users have the same plasma concentration as occasional users but feel less
-- Body composition — drugs distribute into fat tissue differently in different people
-- Genetics — enzyme variants (like CYP2D6 for MDMA) change how fast you metabolise
-- Set and setting — psychological context changes drug effects at identical concentrations
-- Other substances — interactions shift both PK and PD
+Your own experience can differ because of:
+- Tolerance: regular drinkers feel less at the same BAC, but the BAC itself is the same
+- How often you drink: if you rarely drink, you will feel stronger effects at lower levels
+- Mood and setting: the same level can feel very different depending on where you are and how you feel
+- Other substances: combinations change both the level in your blood and what it does to you
 
 The zones are a guide, not a prediction.`,
     },
     {
-      title: 'Multiple doses and accumulation',
+      title: 'Multiple drinks and accumulation',
       emoji: '📈',
-      content: `When you take a second dose before the first is fully eliminated, the new dose adds on top of what remains. This is superposition — and it is why the calculators let you add multiple doses at different times.
+      content: `When you drink again before the last drink has been cleared, the new one adds on top of what is still there.
 
-Try it: add a second dose on any calculator 2 hours after the first. Notice that the second peak is higher than the first, even at the same dose. This is drug accumulation — and it is why experienced users taking the same dose they always take can still overdose after multiple doses.
+Try it on the alcohol calculator: add a second and third drink an hour apart. Each one lifts the curve from where it already was. If you keep drinking at about the pace your body clears alcohol, the line flattens at a high level instead of coming down. The calculator warns you when that happens.
 
 The graph makes this visible. The feeling in your head does not.`,
     },
     {
-      title: 'The long tail — still there, still affecting you',
+      title: 'Half-life, and why alcohol is different',
       emoji: '⏳',
-      content: `Most recreational drugs have half-lives of 1–12 hours. Half-life means: after one half-life, half the drug remains. After two half-lives, a quarter remains. After five half-lives, about 3% remains.
+      content: `Most drugs leave your body with a half-life: after one half-life, half is left; after two, a quarter; after five, about 3%. Take a drug with a 10 hour half-life at midnight, and half of it is still in your body at 10am.
 
-For amphetamines (t½ ~11h), 50% of your Saturday night dose is still present at 11am Sunday. 25% at 10pm Sunday. For MDMA (t½ ~8.5h), significant concentration is present the next morning.
+Alcohol works differently. Your liver removes a roughly fixed amount per hour, usually between 0.10 and 0.25‰. That is why the alcohol curve comes down as a straight line, and why a high BAC simply takes a long time: there is no way to speed it up.
 
-This affects:
-- Sleep quality (impossible to sleep properly while stimulated)
-- Cognitive function next day (concentration, memory, reaction time)
-- Driving — you may be over the legal limit hours after you feel sober
-- Mental health — drugs acting on serotonin/dopamine at low concentrations for extended periods affect mood in the days that follow`,
+A long tail affects:
+- Sleep, which is often poor while a substance is still active
+- Concentration, memory and reaction time the next day
+- Driving: you can still be over the limit hours after you feel sober
+- Mood in the days after a big night`,
     },
     {
       title: "Why 'I've done this loads of times' isn't safety data",
       emoji: '📊',
-      content: `Tolerance means you need more to get the same effect. It does not mean the drug is less harmful. For most drugs, tolerance to subjective effects develops faster than tolerance to cardiovascular effects, neurotoxicity, and organ stress.
+      content: `Tolerance means you need more to feel the same effect. It does not make the substance less harmful, and it does not lower the level in your blood.
 
-This is why experienced users can be at greater risk than beginners for some harms — they take higher doses because effects feel diminished, but the dose-dependent risks (cardiac strain, neurotoxicity, hyperthermia) scale with dose regardless of how experienced you are.
-
-The graph shows dose and time. It does not adjust for experience.`,
+So someone with a high tolerance who takes more to feel something also gets more of the risks that come with a higher dose. The graph shows amount and time. It does not adjust for experience.`,
     },
     {
       title: 'Uncertainty in these models',
       emoji: '📏',
       highlight: 'amber',
-      content: `All the curves on this site are based on population-average pharmacokinetic parameters from published studies. These studies vary in quality, sample size, and methodology.
+      content: `The alcohol calculator uses average values from published forensic and pharmacological research. Your own body can absorb, distribute and clear alcohol faster or slower.
 
-For established drugs like alcohol and MDMA, the data is fairly robust. For newer cathinones (3-MMC, 2-MMC, NEP), human data is almost nonexistent.
+PK-PD tools for other substances are being rebuilt. For some of them, especially newer cathinones like 2-MMC and NEP, there is very little human data at all.
 
-The models are educational tools to illustrate concepts — not precise predictors of your individual experience. Use them to understand pharmacokinetic principles, not to calculate safe doses.`,
+Use the models to understand how your body handles a substance, not to calculate a "safe" amount.`,
     },
   ]
-
 
   return (
     <main className="xp-desktop" style={{ maxWidth: '840px' }}>
       <Window title="How to read the graphs" icon="guide" closeHref="/harm-reduction" status={['PK graph guide']}>
       <p className="xp-intro">
-        The calculators on this site show pharmacokinetic curves — plasma drug concentrations over time. These are not the same as "how high you feel." Here is what they actually mean and why that difference matters.
+        The alcohol calculator shows a pharmacokinetic curve: how much alcohol is in your blood over time. That is not the same as how drunk or high you feel. Here is what the graph means, and why the difference matters. The sources are listed on the Sources page.
       </p>
 
       {sections.map((section, i) => {

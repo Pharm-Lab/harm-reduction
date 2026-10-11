@@ -216,7 +216,7 @@ export default function AlcoholCalculator() {
       ctx.globalAlpha = 1
     }
 
-    // Legal limit line — only when driving
+    // Legal limit line, only when driving
     const limitVal = drvType !== 'none'
       ? (COUNTRIES[cntry][drvType] ?? COUNTRIES[cntry].standard)
       : null
@@ -232,7 +232,7 @@ export default function AlcoholCalculator() {
       ctx.fillStyle  = '#dc2626'
       ctx.font       = '10px Tahoma, Verdana, sans-serif'
       ctx.textAlign  = 'left'
-      ctx.fillText(`Legal limit ${limitVal}‰ (${COUNTRIES[cntry].name.replace(/^\S+\s/, '')})`, pad.left + 4, yS(limitVal) - 4)
+      ctx.fillText(`Legal limit ${limitVal}‰ (${COUNTRIES[cntry].name})`, pad.left + 4, yS(limitVal) - 4)
     }
 
     // Germany 0.3‰ criminal threshold
@@ -247,7 +247,7 @@ export default function AlcoholCalculator() {
       ctx.fillStyle  = '#f97316'
       ctx.font       = '9px Tahoma, Verdana, sans-serif'
       ctx.textAlign  = 'left'
-      ctx.fillText('0.3‰ criminal threshold (DE accident)', pad.left + 4, yS(0.3) - 3)
+      ctx.fillText('0.3‰: criminal with impairment or accident (DE)', pad.left + 4, yS(0.3) - 3)
     }
 
     // Safe to drive marker
@@ -283,7 +283,7 @@ export default function AlcoholCalculator() {
       ctx.fillStyle  = '#f59e0b'
       ctx.font       = '10px Tahoma, Verdana, sans-serif'
       ctx.textAlign  = 'right'
-      ctx.fillText('⚠ Approaching steady state', pad.left + cW - 4, pad.top + cH - 6)
+      ctx.fillText('Drinking as fast as you clear', pad.left + cW - 4, pad.top + cH - 6)
     }
 
     // Drink time markers
@@ -371,11 +371,11 @@ export default function AlcoholCalculator() {
     <main className="xp-desktop">
       <Window title="Alcohol calculator" icon="substance:alcohol" closeHref="/harm-reduction" status={['Widmark model', 'Runs on your device. Nothing you enter is sent anywhere.']}>
       <p className="xp-intro">
-        Based on the Widmark model — the forensic pharmacokinetic standard. The shaded band shows the range between slow and fast ethanol eliminators. Individual variation is real and significant.
+        See how your blood alcohol concentration (BAC) rises and falls over a night, based on the Widmark model that forensic labs still use. The blue line is a typical person. The shaded band shows the range between people who clear alcohol slowly and people who clear it fast. Scroll down to learn what is happening in your body at each step.
       </p>
 
       <div className="xp-alert xp-alert-warn" style={{ marginBottom: '1.25rem', fontSize: '13.5px' }}>
-        <strong>Never drink and drive.</strong> This tool models population averages — your actual BAC may be higher or lower. Do not use this to decide whether you are safe to drive. When in doubt, don't drive.
+        <strong>Never use this to decide whether you can drive.</strong> The model shows averages, and your real BAC can be higher. If you have been drinking, don't drive.
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: '1.5rem' }}>
@@ -413,7 +413,7 @@ export default function AlcoholCalculator() {
               <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Stomach contents</label>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button onClick={() => setWithFood(false)} style={btn(!withFood)} aria-pressed={Boolean(!withFood)}>Empty stomach</button>
-                <button onClick={() => setWithFood(true)}  style={btn(withFood)} aria-pressed={Boolean(withFood)}>With food (~30% lower peak)</button>
+                <button onClick={() => setWithFood(true)}  style={btn(withFood)} aria-pressed={Boolean(withFood)}>After a meal (slower absorption)</button>
               </div>
             </div>
           </div>
@@ -440,14 +440,18 @@ export default function AlcoholCalculator() {
                   style={btn(driverType === 'standard')} aria-pressed={Boolean(driverType === 'standard')}>
                   Standard ({COUNTRIES[country].standard}‰)
                 </button>
-                <button onClick={() => setDriverType('novice')}
-                  style={btn(driverType === 'novice')} aria-pressed={Boolean(driverType === 'novice')}>
-                  {COUNTRIES[country].noviceLabel} ({COUNTRIES[country].novice}‰)
-                </button>
-                <button onClick={() => setDriverType('professional')}
-                  style={btn(driverType === 'professional')} aria-pressed={Boolean(driverType === 'professional')}>
-                  {COUNTRIES[country].proLabel} ({COUNTRIES[country].professional}‰)
-                </button>
+                {COUNTRIES[country].novice != null && (
+                  <button onClick={() => setDriverType('novice')}
+                    style={btn(driverType === 'novice')} aria-pressed={Boolean(driverType === 'novice')}>
+                    {COUNTRIES[country].noviceLabel} ({COUNTRIES[country].novice}‰)
+                  </button>
+                )}
+                {COUNTRIES[country].professional != null && (
+                  <button onClick={() => setDriverType('professional')}
+                    style={btn(driverType === 'professional')} aria-pressed={Boolean(driverType === 'professional')}>
+                    {COUNTRIES[country].proLabel} ({COUNTRIES[country].professional}‰)
+                  </button>
+                )}
                 <button onClick={() => setDriverType('none')}
                   style={btn(driverType === 'none')} aria-pressed={Boolean(driverType === 'none')}>
                   Not driving
@@ -457,14 +461,14 @@ export default function AlcoholCalculator() {
               {/* Germany criminal threshold note */}
               {COUNTRIES[country].note && driverType !== 'none' && (
                 <div className="xp-alert xp-alert-warn" style={{ marginTop: '8px', fontSize: '12.5px' }}>
-                  ⚠ {COUNTRIES[country].note}
+                  {COUNTRIES[country].note}
                 </div>
               )}
 
               {/* Not driving confirmation */}
               {driverType === 'none' && (
                 <div className="xp-alert xp-alert-ok" style={{ marginTop: '8px', fontSize: '12.5px' }}>
-                  ✓ Not driving selected — no legal limit line shown.
+                  Not driving, so no legal limit line is shown.
                 </div>
               )}
             </div>
@@ -486,7 +490,7 @@ export default function AlcoholCalculator() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <span style={{ fontSize: '13.5px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>Drink {idx + 1}</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)' }}>{eg.toFixed(1)}g ethanol / {(eg/10).toFixed(2)} units</span>
+                      <span style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)' }}>{eg.toFixed(1)} g alcohol ({(eg/10).toFixed(1)} standard drinks)</span>
                       {drinks.length > 1 && (
                         <button onClick={() => removeDrink(d.id)}
                           style={{ fontSize: '18px', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
@@ -576,7 +580,7 @@ export default function AlcoholCalculator() {
             </button>
 
             <div className="xp-group" style={{ marginTop: '10px', fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', padding: '12px 14px' }}>
-              Total: <strong>{totalEthanol.toFixed(1)}g ethanol</strong> — <strong>{totalUnits.toFixed(1)}</strong> Dutch units (1 unit = 10g)
+              Total: <strong>{totalEthanol.toFixed(1)} g alcohol</strong>, which is <strong>{totalUnits.toFixed(1)}</strong> Dutch standard drinks (10 g each)
             </div>
           </div>
         </div>
@@ -592,7 +596,7 @@ export default function AlcoholCalculator() {
 
           {/* Graph controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13.5px' }}>
-            <span style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--xp-text-dim)', whiteSpace: 'nowrap' }}>SHOW</span>
+            <span style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--xp-text-dim)', whiteSpace: 'nowrap' }}>Show</span>
             <input type="range" min={4} max={24} step={1} value={timeScale}
               onChange={e => setTimeScale(parseInt(e.target.value))}
               style={{ flex: 1, accentColor: '#2fb34a' }} />
@@ -605,9 +609,9 @@ export default function AlcoholCalculator() {
 
           {/* Zone legend */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-            {BAC_ZONES.slice(0, 6).map(z => (
-              <span key={z.label} style={{ fontSize: '11.5px', padding: '2px 8px', borderRadius: '2px', background: z.color + '22', color: z.color, border: `1px solid ${z.color}44` }}>
-                {z.min}–{z.max === 10 ? '3.0+' : z.max}‰ {z.label}
+            {BAC_ZONES.map(z => (
+              <span key={z.label} title={z.detail} style={{ fontSize: '11.5px', padding: '2px 8px', borderRadius: '2px', background: z.color + '22', color: z.color, border: `1px solid ${z.color}44` }}>
+                {z.max === 10 ? `${z.min.toFixed(1)}‰ and up` : `${z.min.toFixed(1)} to ${z.max.toFixed(1)}‰`}: {z.label}
               </span>
             ))}
           </div>
@@ -647,7 +651,7 @@ export default function AlcoholCalculator() {
                 {
                   label: 'Widmark peak (max)',
                   value: metrics.widmarkPeak + '‰',
-                  sub:   'Theoretical max — instantaneous absorption',
+                  sub:   'If all alcohol were absorbed at once',
                   color: 'var(--xp-text-dim)',
                 },
               ].map(m => (
@@ -660,22 +664,16 @@ export default function AlcoholCalculator() {
             </div>
           )}
 
-          {/* PK education note */}
-          <div className="xp-alert xp-alert-info" style={{ fontSize: '13.5px' }}>
-            <p style={{ margin: '0 0 8px' }}>
-              <strong>Why water doesn't speed sobering up:</strong> Ethanol elimination is enzyme-limited — alcohol dehydrogenase works at maximum capacity at typical BAC levels (zero-order / Michaelis-Menten saturation). Water hydrates you and reduces nausea but does not increase elimination rate. Only time sobers you up. This is the same MM kinetics shown in the PK calculator.
-            </p>
-           <p style={{ margin: 0 }}>
-              <strong>Widmark vs simulated peak:</strong> The Widmark value above assumes instantaneous absorption — the theoretical maximum used by forensic labs and courts. The simulated peak is lower because absorption and elimination happen simultaneously in reality. Your actual peak will be somewhere between the two depending on how quickly you drink.
-            </p>
-          </div>
-
           {/* Steady state warning */}
           {metrics?.steadyState && (
             <div className="xp-alert xp-alert-warn" style={{ fontSize: '13.5px' }}>
-              <strong>Steady state approaching</strong> — your drinking rate is close to your elimination rate. BAC will plateau rather than fall. Adding more drinks will continue to raise BAC. This is how people unknowingly drink to dangerous levels over long sessions.
+              <strong>You are drinking about as fast as your body clears alcohol.</strong> Your BAC stops falling and stays high. Every extra drink pushes it up further. This is how long sessions end at dangerous levels without it ever feeling like a lot at once.
             </div>
           )}
+
+          <div className="xp-alert xp-alert-info" style={{ fontSize: '13.5px' }}>
+            <strong>Two peaks, two meanings.</strong> The <em>simulated peak</em> follows your drinks over time, so absorption and breakdown happen at the same time. The <em>Widmark peak</em> assumes every drink reached your blood at once. Your real peak usually sits between the two: closer to Widmark if you drink fast, closer to the simulation if you spread your drinks.
+          </div>
 
           {/* Support footer */}
           <div className="xp-group" style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)', padding: '12px 14px' }}>
@@ -683,6 +681,127 @@ export default function AlcoholCalculator() {
           </div>
         </div>
       </div>
+      </Window>
+
+      <Window title="How alcohol moves through your body" icon="guide" closeHref={null} headingLevel={2}
+        status={['Every step is sourced', 'See the Sources page for details']}>
+        <style>{`
+          .edu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+          .edu { margin-top: 24px; padding-top: 18px; }
+          .edu p { margin: 0 0 10px; line-height: 1.7; }
+          .edu p:last-child { margin-bottom: 0; }
+          .edu ul { margin: 0 0 10px; padding-left: 20px; line-height: 1.7; }
+          .edu .calc { padding: 8px 12px; margin: 4px 0 10px; font-size: 13.5px; }
+          @media (max-width: 760px) { .edu-grid { grid-template-columns: 1fr; } }
+        `}</style>
+
+        <p className="xp-intro">
+          The curve above is pharmacokinetics: what your body does to alcohol. These four steps explain its shape,
+          and the effect zones show the other side, what alcohol does to you.
+        </p>
+
+        <div className="edu-grid">
+          <section className="xp-group edu">
+            <h3 className="xp-legend" style={{ fontWeight: 'bold' }}>1. Absorption: the curve goes up</h3>
+            <p>
+              After you drink, alcohol passes from your stomach and gut into your blood. For most people this is
+              complete somewhere between 30 minutes and 2 hours after the drink, and it can take up to 2 hours after
+              the last one.
+            </p>
+            <p>
+              Food in your stomach slows this down and lowers the whole curve. That is why the &ldquo;after a meal&rdquo;
+              option gives a slower, flatter rise. It also means your BAC can still be climbing when you have already stopped drinking.
+            </p>
+          </section>
+
+          <section className="xp-group edu">
+            <h3 className="xp-legend" style={{ fontWeight: 'bold' }}>2. Distribution: why weight and sex matter</h3>
+            <p>
+              Alcohol spreads through the water in your body. The Widmark factor <em>r</em> describes how much of your body
+              weight takes part in that. On average it is about 0.68 for men and 0.55 for women.
+            </p>
+            <p>
+              Less body water means the same alcohol ends up more concentrated. That is why women, people with more body fat
+              and older people usually reach a higher BAC from the same drinks, and why a lighter body weight gives a higher curve.
+            </p>
+            <div className="calc xp-well">
+              Widmark peak = grams of alcohol &divide; (body weight in kg &times; <em>r</em>)<br />
+              Example: 3 standard drinks (30 g), 70 kg man: 30 &divide; (70 &times; 0.68) &asymp; 0.63&permil;
+            </div>
+          </section>
+
+          <section className="xp-group edu">
+            <h3 className="xp-legend" style={{ fontWeight: 'bold' }}>3. Metabolism: what your liver does</h3>
+            <p>
+              Your liver breaks down more than 90% of the alcohol you drink. A small part is already broken down in your stomach.
+            </p>
+            <ul>
+              <li><strong>Alcohol dehydrogenase (ADH)</strong> turns alcohol into acetaldehyde.</li>
+              <li><strong>Aldehyde dehydrogenase (ALDH)</strong> turns acetaldehyde into acetate, which muscles and the heart use up.</li>
+              <li><strong>CYP2E1</strong> handles about 10%. Regular heavy drinking makes the body produce more of it.</li>
+            </ul>
+          </section>
+
+          <section className="xp-group edu">
+            <h3 className="xp-legend" style={{ fontWeight: 'bold' }}>4. Elimination: the curve goes down in a straight line</h3>
+            <p>
+              Most drugs leave your body faster when there is more of them. Alcohol does not. Once your BAC is above a very
+              low level, the enzymes work at full capacity and remove a roughly fixed amount per hour. That is why the
+              downslope on the graph is a straight line instead of a curve.
+            </p>
+            <p>
+              For most people that fixed amount is between 0.10 and 0.25&permil; per hour. The blue line uses 0.15, and the
+              shaded band shows the full range.
+            </p>
+            <div className="calc xp-well">
+              From 1.0&permil; at 0.15&permil; per hour: 1.0 &divide; 0.15 &asymp; 6 hours 40 minutes until sober.<br />
+              A slow eliminator (0.10&permil; per hour) needs 10 hours.
+            </div>
+          </section>
+        </div>
+
+        <div className="edu-grid">
+          <section className="xp-group edu">
+            <h3 className="xp-legend" style={{ fontWeight: 'bold' }}>Coffee, water and cold showers</h3>
+            <p>
+              None of these speed up step 4. Coffee can make you feel more awake, but your liver still clears alcohol
+              at the same pace. A cold shower, coffee or walking also does not help someone with alcohol poisoning,
+              and can make things worse. Only time lowers your BAC.
+            </p>
+          </section>
+
+          <section className="xp-group edu">
+            <h3 className="xp-legend" style={{ fontWeight: 'bold' }}>What counts as one drink</h3>
+            <p>
+              A Dutch standard drink contains about 10 grams of alcohol: 250 ml of beer at 5%, 100 ml of wine at 12.5%
+              or 35 ml of spirits at 35%. Real servings are often bigger. A 330 ml bottle of 5% beer is 1.3 standard
+              drinks, and a large glass of wine can easily be two.
+            </p>
+          </section>
+        </div>
+
+        <div className="xp-alert xp-alert-error" style={{ marginTop: '22px' }}>
+          <strong>Alcohol poisoning: call 112.</strong> Call straight away if someone is confused, cannot stay awake or
+          cannot be woken, is vomiting, has a seizure, breathes slowly or irregularly, or has cold, pale or bluish skin.
+          Do not wait for all the signs. Stay with them. If they are lying down, roll them onto their side so they cannot
+          choke if they vomit. Do not let them &ldquo;sleep it off&rdquo;: BAC can keep rising after someone has stopped
+          drinking or passed out.
+        </div>
+
+        <div className="xp-alert xp-alert-warn" style={{ marginTop: '12px' }}>
+          <strong>There is no safe amount for your long-term health.</strong> Alcohol is classified as a Group 1 carcinogen
+          and causes at least seven types of cancer. No level has been found below which that risk disappears.
+        </div>
+
+        <section className="xp-group edu">
+          <h3 className="xp-legend" style={{ fontWeight: 'bold' }}>What this model leaves out</h3>
+          <ul>
+            <li>It uses average values. Your own absorption, body water and elimination rate can differ.</li>
+            <li>Food is modelled as slower absorption. In reality food also lowers how much alcohol reaches your blood, so the real curve after a meal can be lower still.</li>
+            <li>Tolerance does not change your BAC, only how drunk you feel. Feeling fine is not the same as being under the limit.</li>
+            <li>The effect zones are indications for experienced drinkers. If you rarely drink, you will feel stronger effects at lower levels.</li>
+          </ul>
+        </section>
       </Window>
     </main>
   )

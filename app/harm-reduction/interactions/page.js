@@ -25,7 +25,7 @@ export default function InteractionChecker() {
     <main className="xp-desktop">
       <Window title="Drug interaction checker" icon="interactions" closeHref="/harm-reduction" status={['Sources: TripSit and published pharmacology', 'Runs on your device. Nothing you enter is sent anywhere.']}>
       <p className="xp-intro">
-        Select two or more substances to see all interactions. Severity ratings are hardcoded from pharmacological literature — not AI-generated.
+        Select two or more substances to see all interactions. Severity ratings are fixed values from the TripSit chart and pharmacological literature, not AI-generated.
       </p>
 
       {/* Critical note */}
@@ -177,7 +177,7 @@ export default function InteractionChecker() {
 
           {/* Footer */}
           <div className="xp-group" style={{ marginTop: '1rem', fontSize: '12.5px', color: 'var(--xp-text-dim)', lineHeight: '1.6', padding: '12px 14px' }}>
-            Interactions sourced from TripSit interaction database, published pharmacology literature, and clinical case reports. Severity ratings are hardcoded — not AI-generated. For prescription drug interactions, always consult a pharmacist or physician.
+            Interactions are based on the TripSit combination chart and published pharmacology; see the Sources page. Severity ratings are fixed values, not AI-generated. For prescription drug interactions, always ask a pharmacist or doctor.
           </div>
         </div>
       )}

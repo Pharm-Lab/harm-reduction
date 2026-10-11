@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import XpIcon from './XpIcon'
 
 const LINKS = [
-  { href: '/harm-reduction',              label: 'Calculators',  icon: 'chart', exact: true },
+  { href: '/harm-reduction',              label: 'Substances',   icon: 'chart', exact: true },
   { href: '/harm-reduction/interactions', label: 'Interactions', icon: 'interactions' },
   { href: '/harm-reduction/guide',        label: 'Guide',        icon: 'guide' },
   { href: '/sources',                     label: 'Sources',      icon: 'folder' },
