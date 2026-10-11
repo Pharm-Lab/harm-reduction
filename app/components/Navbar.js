@@ -2,18 +2,23 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs'
+
+// Placeholder name until the new project has its own
+const SITE_NAME = 'Harm Reduction'
+const ACCENT = '#7c3aed'
 
 const LINKS = [
-  { href: '/tools',          label: 'Tools' },
-  { href: '/lab',            label: 'Lab Prep' },
-  { href: '/formulas',       label: 'Formulas' },
-  { href: '/quiz',           label: 'Quiz' },
-  { href: '/play',           label: 'Play' },
-  { href: '/harm-reduction', label: 'Harm Reduction' },
-  { href: '/sources',        label: 'Sources' },
-  { href: '/about',          label: 'About' },
+  { href: '/harm-reduction',              label: 'Calculators', exact: true },
+  { href: '/harm-reduction/interactions', label: 'Interactions' },
+  { href: '/harm-reduction/guide',        label: 'Guide' },
+  { href: '/sources',                     label: 'Sources' },
+  { href: '/about',                       label: 'About' },
 ]
+
+function isActive(pathname, link) {
+  if (!pathname) return false
+  return link.exact ? pathname === link.href : pathname.startsWith(link.href)
+}
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -28,9 +33,6 @@ export default function Navbar() {
 
   // Close menu on route change
   useEffect(() => { setMenuOpen(false) }, [pathname])
-
-  const isHR = pathname?.startsWith('/harm-reduction')
-  const accentColor = isHR ? '#7c3aed' : '#2a6fdb'
 
   return (
     <>
@@ -56,7 +58,7 @@ export default function Navbar() {
           left: 0; right: 0;
           height: 2px;
           border-radius: 999px;
-          background: var(--nav-accent);
+          background: ${ACCENT};
         }
         .nav-logo {
           font-size: 17px;
@@ -94,16 +96,15 @@ export default function Navbar() {
           ? '1px solid rgba(255,255,255,0.08)'
           : '1px solid rgba(255,255,255,0.04)',
         transition: 'background 0.25s, border-color 0.25s',
-        '--nav-accent': accentColor,
       }}>
 
         {/* Logo */}
         <Link href="/" className="nav-logo">
           <svg width="32" height="32" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'block' }}>
-            <ellipse cx="399.99999" cy="400.00001" rx="256" ry="256" stroke={accentColor} strokeWidth="38" fill="none"/>
-            <path d="M188.33331,519.6217 C202.83331,517.6217 218.33331,499.6217 239.08331,459.6217 C257.20831,427.6217 268.08331,369.6217 293.45831,344.6217 C311.58331,321.6217 329.70831,321.6217 347.83331,337.6217 C369.58331,357.6217 384.08331,399.6217 405.83331,439.6217 C427.58331,477.6217 450.45831,504.6217 482.95831,517.6217 C515.45831,527.6217 551.95831,531.6217 624.45832,533.6217" stroke={accentColor} strokeWidth="28" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            <ellipse cx="399.99999" cy="400.00001" rx="256" ry="256" stroke={ACCENT} strokeWidth="38" fill="none"/>
+            <path d="M188.33331,519.6217 C202.83331,517.6217 218.33331,499.6217 239.08331,459.6217 C257.20831,427.6217 268.08331,369.6217 293.45831,344.6217 C311.58331,321.6217 329.70831,321.6217 347.83331,337.6217 C369.58331,357.6217 384.08331,399.6217 405.83331,439.6217 C427.58331,477.6217 450.45831,504.6217 482.95831,517.6217 C515.45831,527.6217 551.95831,531.6217 624.45832,533.6217" stroke={ACCENT} strokeWidth="28" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
           </svg>
-          PharmLab
+          {SITE_NAME}
         </Link>
 
         {/* Desktop links */}
@@ -112,38 +113,11 @@ export default function Navbar() {
             <Link
               key={l.href}
               href={l.href}
-              className={`nav-link${pathname?.startsWith(l.href) ? ' active' : ''}`}
+              className={`nav-link${isActive(pathname, l) ? ' active' : ''}`}
             >
               {l.label}
             </Link>
           ))}
-        </div>
-
-        {/* Right: auth */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" appearance={{
-              elements: { avatarBox: { width: 30, height: 30 } }
-            }}>
-              <UserButton.MenuItems>
-                <UserButton.Link label="My Profile" labelIcon={<span>👤</span>} href="/user" />
-                <UserButton.Action label="manageAccount" />
-                <UserButton.Action label="signOut" />
-              </UserButton.MenuItems>
-            </UserButton>
-          </SignedIn>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button style={{
-                padding: '6px 16px', borderRadius: '8px',
-                border: '1px solid rgba(255,255,255,0.15)',
-                background: 'rgba(255,255,255,0.06)',
-                color: 'rgba(240,244,255,0.8)',
-                fontSize: '13px', fontWeight: '500', cursor: 'pointer',
-                fontFamily: "'Inter', system-ui, sans-serif",
-              }}>Sign in</button>
-            </SignInButton>
-          </SignedOut>
         </div>
 
         {/* Mobile menu button */}
@@ -188,7 +162,7 @@ export default function Navbar() {
                 padding: '12px 1.5rem',
                 fontSize: '15px',
                 fontWeight: '500',
-                color: pathname?.startsWith(l.href) ? '#f0f4ff' : 'rgba(240,244,255,0.6)',
+                color: isActive(pathname, l) ? '#f0f4ff' : 'rgba(240,244,255,0.6)',
                 textDecoration: 'none',
                 fontFamily: "'Inter', system-ui, sans-serif",
               }}
