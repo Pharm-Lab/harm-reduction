@@ -137,7 +137,7 @@ export default function AboutPage() {
         {/* Text */}
         <div style={{ position: 'relative', zIndex: 2, maxWidth: '1000px', margin: '0 auto', padding: '5rem 2rem', width: '100%' }}>
           <div style={{ maxWidth: '500px' }}>
-            <Link href="/" style={{ fontSize: '13px', color: C.textDim, textDecoration: 'none', display: 'inline-block', marginBottom: '2rem' }}>← PharmLab</Link>
+            <Link href="/" style={{ fontSize: '13px', color: C.textDim, textDecoration: 'none', display: 'inline-block', marginBottom: '2rem' }}>← Home</Link>
             <p style={{ fontSize: '11px', color: C.blueLight, fontWeight: '700', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: '14px', margin: '0 0 14px' }}>About</p>
             <h1 style={{ fontSize: 'clamp(30px, 5vw, 50px)', fontWeight: '800', color: C.text, letterSpacing: '-0.03em', lineHeight: 1.05, margin: '0 0 20px' }}>
               A student project<br />
@@ -167,7 +167,7 @@ export default function AboutPage() {
         {/* Footer */}
         <div style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: `1px solid ${C.border}` }}>
           <p style={{ fontSize: '13px', color: C.textDim, lineHeight: '1.7', maxWidth: '580px', margin: '0 0 24px' }}>
-            PharmLab is an independent student project — not affiliated with Leiden University or any institution. Educational purposes only. PK models use population averages. Nothing here is medical advice.
+            Clearance is an independent student project — not affiliated with Leiden University or any institution. Educational purposes only. PK models use population averages. Nothing here is medical advice.
           </p>
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             <Link href="/tools"          style={{ fontSize: '13px', color: C.blueLight,   textDecoration: 'none' }}>Academic tools →</Link>

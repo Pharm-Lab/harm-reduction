@@ -221,7 +221,7 @@ export default function CannabisCalculator() {
     const ctx = off.getContext('2d'); ctx.scale(scale, scale)
     drawCanvas(ctx, W, H)
     const link = document.createElement('a')
-    link.download = 'pharmlab-thc-curve.png'; link.href = off.toDataURL('image/png', 1.0); link.click()
+    link.download = 'clearance-thc-curve.png'; link.href = off.toDataURL('image/png', 1.0); link.click()
   }
 
   function updateDose(id, field, value) {

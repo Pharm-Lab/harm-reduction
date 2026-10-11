@@ -121,10 +121,6 @@ The models are educational tools to illustrate concepts — not precise predicto
           </div>
         )
       })}
-
-      <div style={{ padding: '1rem 1.25rem', background: 'rgba(42,111,219,0.1)', border: '1px solid rgba(42,111,219,0.3)', borderRadius: '12px', fontSize: '12px', color: '#93b4f7', lineHeight: '1.6' }}>
-        Questions about a specific graph or concept? The PK/PD exercise helper on the academic tools side of PharmLab can answer questions about pharmacokinetic principles in detail.
-      </div>
     </main>
   )
 }

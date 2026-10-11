@@ -220,7 +220,7 @@ export default function MDMACalculator() {
     ctx.scale(scale, scale)
     drawCanvas(ctx, W, H)
     const link = document.createElement('a')
-    link.download = 'pharmlab-mdma-curve.png'
+    link.download = 'clearance-mdma-curve.png'
     link.href = off.toDataURL('image/png', 1.0)
     link.click()
   }

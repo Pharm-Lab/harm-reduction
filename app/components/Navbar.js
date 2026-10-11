@@ -3,8 +3,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-// Placeholder name until the new project has its own
-const SITE_NAME = 'Harm Reduction'
+const SITE_NAME = 'Clearance'
 const ACCENT = '#7c3aed'
 
 const LINKS = [
@@ -100,9 +99,15 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="nav-logo">
-          <svg width="32" height="32" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'block' }}>
-            <ellipse cx="399.99999" cy="400.00001" rx="256" ry="256" stroke={ACCENT} strokeWidth="38" fill="none"/>
-            <path d="M188.33331,519.6217 C202.83331,517.6217 218.33331,499.6217 239.08331,459.6217 C257.20831,427.6217 268.08331,369.6217 293.45831,344.6217 C311.58331,321.6217 329.70831,321.6217 347.83331,337.6217 C369.58331,357.6217 384.08331,399.6217 405.83331,439.6217 C427.58331,477.6217 450.45831,504.6217 482.95831,517.6217 C515.45831,527.6217 551.95831,531.6217 624.45832,533.6217" stroke={ACCENT} strokeWidth="28" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'block' }} aria-hidden="true">
+            <defs>
+              <linearGradient id="clearance-fade" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#a78bfa" />
+                <stop offset="1" stopColor={ACCENT} stopOpacity="0.25" />
+              </linearGradient>
+            </defs>
+            <path d="M47.56 16.44 A22 22 0 1 0 47.56 47.56" stroke="url(#clearance-fade)" strokeWidth="7" strokeLinecap="round" />
+            <circle cx="47.56" cy="16.44" r="6" fill="#a78bfa" />
           </svg>
           {SITE_NAME}
         </Link>

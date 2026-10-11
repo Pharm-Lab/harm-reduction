@@ -312,7 +312,7 @@ export default function Sources() {
         <div style={{ marginTop:'1.5rem', padding:'16px 18px', background:'#0f1629', border:`1px solid ${C.border}`, borderRadius:'12px', fontSize:'12px', color:C.textDim, lineHeight:'1.7' }}>
           <span style={{ color:C.textMid, fontWeight:'600' }}>Accessing sources:</span> Journal articles are available through Universiteit Leiden library (LUCRIS). Core textbooks — Rowland & Tozer, Shargel, Clayden, Hansen/Pedersen-Bjergaard/Rasmussen — are in UB Leiden.
           <br /><br />
-          <span style={{ color:C.textMid, fontWeight:'600' }}>AI-generated content:</span> The drug interaction checker and exercise helper use Claude (Anthropic). AI output should be cross-checked against primary sources. PharmLab is an educational tool — not a clinical decision support system.
+          <span style={{ color:C.textMid, fontWeight:'600' }}>AI-generated content:</span> The drug interaction checker and exercise helper use Claude (Anthropic). AI output should be cross-checked against primary sources. Clearance is an educational tool — not a clinical decision support system.
         </div>
       </div>
     </main>
