@@ -175,7 +175,7 @@ export default function KetamineCalculator() {
     const ctx = off.getContext('2d'); ctx.scale(scale, scale)
     drawCanvas(ctx, W, H)
     const link = document.createElement('a')
-    link.download = 'clearance-ketamine-curve.png'
+    link.download = 'myclearance-ketamine-curve.png'
     link.href = off.toDataURL('image/png', 1.0); link.click()
   }
 

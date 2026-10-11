@@ -167,7 +167,7 @@ export default function AboutPage() {
         {/* Footer */}
         <div style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: `1px solid ${C.border}` }}>
           <p style={{ fontSize: '13px', color: C.textDim, lineHeight: '1.7', maxWidth: '580px', margin: '0 0 24px' }}>
-            Clearance is an independent student project — not affiliated with Leiden University or any institution. Educational purposes only. PK models use population averages. Nothing here is medical advice.
+            myClearance is an independent student project — not affiliated with Leiden University or any institution. Educational purposes only. PK models use population averages. Nothing here is medical advice.
           </p>
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             <Link href="/tools"          style={{ fontSize: '13px', color: C.blueLight,   textDecoration: 'none' }}>Academic tools →</Link>

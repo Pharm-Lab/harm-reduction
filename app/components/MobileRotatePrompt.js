@@ -48,7 +48,7 @@ export default function MobileRotatePrompt() {
           Rotate your phone
         </p>
         <p style={{ fontSize: '14px', color: 'rgba(240,244,255,0.55)', margin: 0, lineHeight: '1.6' }}>
-          Clearance works best in landscape mode.<br />
+          myClearance works best in landscape mode.<br />
           Flip your phone sideways to continue.
         </p>
       </div>

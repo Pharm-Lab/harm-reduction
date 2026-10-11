@@ -3,7 +3,7 @@ import MobileRotatePrompt from './components/MobileRotatePrompt'
 import './globals.css'
 
 export const metadata = {
-  title: 'Clearance',
+  title: 'myClearance',
   description: 'Pharmacokinetic calculators and harm reduction information. No accounts, no tracking.',
 }
 

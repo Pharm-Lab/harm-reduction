@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-const SITE_NAME = 'Clearance'
 const ACCENT = '#7c3aed'
 
 const LINKS = [
@@ -109,7 +108,7 @@ export default function Navbar() {
             <path d="M47.56 16.44 A22 22 0 1 0 47.56 47.56" stroke="url(#clearance-fade)" strokeWidth="7" strokeLinecap="round" />
             <circle cx="47.56" cy="16.44" r="6" fill="#a78bfa" />
           </svg>
-          {SITE_NAME}
+          <span><span style={{ color: '#a78bfa' }}>my</span>Clearance</span>
         </Link>
 
         {/* Desktop links */}
