@@ -9,11 +9,12 @@ const SUPPORT = [
   { name: 'Drugsinfo.nl', url: 'https://www.drugsinfo.nl' },
 ]
 
-export default function InfoPage({ id }) {
+export default function InfoPage({ id, embedded = false }) {
   const s = SUBSTANCES[id]
+  const Wrap = embedded ? 'div' : 'main'
 
   return (
-    <main className="xp-desktop" style={{ maxWidth: '980px' }}>
+    <Wrap className="xp-desktop" style={embedded ? { paddingTop: 0 } : { maxWidth: '980px' }}>
       <style>{`
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
         .info-group { margin-top: 24px; padding-top: 18px; }
@@ -34,17 +35,19 @@ export default function InfoPage({ id }) {
       `}</style>
 
       <Window
-        title={s.title}
-        icon={`substance:${id}`}
-        status={['Information page', 'PK-PD interactive tool coming soon']}
+        title={embedded ? `${s.title}: what else to know` : s.title}
+        icon={embedded ? 'info' : `substance:${id}`}
+        closeHref={embedded ? null : undefined}
+        headingLevel={embedded ? 2 : undefined}
+        status={embedded ? ['Information', 'Sources listed below'] : ['Information page', 'PK-PD interactive tool coming soon']}
       >
         <p className="xp-intro">{s.intro}</p>
 
-        <div className="xp-alert xp-alert-info" style={{ marginBottom: '12px' }}>
+        {!embedded && <div className="xp-alert xp-alert-info" style={{ marginBottom: '12px' }}>
           <strong>PK-PD interactive tool coming soon.</strong> The interactive model for {s.title.toLowerCase()} is being rebuilt
           so it meets the same standard as the <Link href="/harm-reduction/alcohol">alcohol calculator</Link>.
           Until then, this page covers what is most worth knowing.
-        </div>
+        </div>}
 
         <div className={`xp-alert xp-alert-${s.alert.kind}`}>
           <strong>{s.alert.title}</strong> {s.alert.text}
@@ -137,6 +140,6 @@ export default function InfoPage({ id }) {
           </p>
         </section>
       </Window>
-    </main>
+    </Wrap>
   )
 }

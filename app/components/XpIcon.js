@@ -14,6 +14,8 @@ export default function XpIcon({ name, light = false, size = 16 }) {
       return <svg {...common}><path d="M1 3.5h5l1.2 1.5H15v8.5H1z" fill="#e8b93a" /><path d="M1 6h14v7.5H1z" fill="#f5c84a" /></svg>
     case 'info':
       return <svg {...common}><circle cx="8" cy="8" r="7" fill="#2f6fdb" stroke={light ? '#fff' : '#123a85'} strokeWidth=".8" /><path d="M8 7v5" stroke="#fff" strokeWidth="2" /><circle cx="8" cy="4.5" r="1.1" fill="#fff" /></svg>
+    case 'model':
+      return <svg {...common}><rect x="1" y="2" width="5" height="4" fill="#2b2f45" stroke={stroke} /><rect x="10" y="2" width="5" height="4" fill="#2b2f45" stroke={stroke} /><rect x="5.5" y="10" width="5" height="4" fill="#2b2f45" stroke={stroke} /><path d="M6 4h4M3.5 6v3.5h3M12.5 6v3.5h-3" fill="none" stroke={stroke} /></svg>
     case 'shield':
       return <svg {...common}><path d="M8 1l6 2v5c0 4-3 6-6 7-3-1-6-3-6-7V3z" fill="#2fb34a" stroke="#0b5a1e" /><path d="M5 8l2 2 4-4" stroke="#fff" strokeWidth="1.6" fill="none" /></svg>
     default:

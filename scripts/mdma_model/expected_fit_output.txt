@@ -1,0 +1,5 @@
+PK  V=350 L  CL0=163.0 L/h  kinact=3.72 L/(mg h)  loss=0.0095
+PD  n=2.0: ke0=3.58/h ktol=0.004/h alpha=151.70  loss=0.3754
+PD  n=2.5: ke0=4.07/h ktol=0.006/h alpha=70.49  loss=0.2214
+PD  n=3.0: ke0=3.79/h ktol=0.190/h alpha=3.05  loss=0.1585
+Best Hill slope: 3.0

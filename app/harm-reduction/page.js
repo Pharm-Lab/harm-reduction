@@ -5,7 +5,7 @@ import SubstanceIcon from '@/app/components/SubstanceIcon'
 
 const SUBSTANCES = [
   { icon:'alcohol',      title:'Alcohol',      tag:'PK-PD calculator', desc:'Watch your blood alcohol rise and fall over a night, with effects, driving limits and how your body clears it.', href:'/harm-reduction/alcohol' },
-  { icon:'mdma',         title:'MDMA',         tag:'Info page',        desc:'Pill strength, what else turns up in samples, overheating and risky combinations.', href:'/harm-reduction/mdma' },
+  { icon:'mdma',         title:'MDMA',         tag:'PK-PD calculator', desc:'Blood level and felt effect side by side, why redosing adds more drug than feeling, and pill strength.', href:'/harm-reduction/mdma' },
   { icon:'cannabis',     title:'Cannabis',     tag:'Info page',        desc:'Why edibles catch people out, and the mental health risks of frequent use.', href:'/harm-reduction/cannabis' },
   { icon:'cocaine',      title:'Cocaine',      tag:'Info page',        desc:'Rising purity, what it is cut with, and why mixing with alcohol is riskier.', href:'/harm-reduction/cocaine' },
   { icon:'amphetamines', title:'Amphetamines', tag:'Info page',        desc:'Why speed keeps you up so long, and what else is often in it.', href:'/harm-reduction/amphetamines' },
@@ -15,6 +15,7 @@ const SUBSTANCES = [
 
 const RESOURCES = [
   { icon:'interactions', title:'Interaction checker', desc:'How recreational and prescription drugs combine, and how dangerous each pairing is.', href:'/harm-reduction/interactions' },
+  { icon:'model', title:'Models',              desc:'Every model behind the calculators, with its equations, parameters, sources and code, so anyone can check or rebuild it.', href:'/models' },
   { icon:'guide', title:'PK graph guide',      desc:'What the curves mean in plain English: peak, half-life, and why you can still be high.', href:'/harm-reduction/guide' },
   { icon:'guide', title:'Sources',             desc:'Every source behind the site, with what came from it and how it is used.', href:'/sources' },
 ]
@@ -95,6 +96,7 @@ export default function HarmReductionPage() {
               <ul>
                 <li><Link href="/harm-reduction/interactions"><XpIcon name="interactions" />Interaction checker</Link></li>
                 <li><Link href="/harm-reduction/guide"><XpIcon name="guide" />PK graph guide</Link></li>
+                <li><Link href="/models"><XpIcon name="model" />Models</Link></li>
                 <li><Link href="/sources"><XpIcon name="folder" />Sources</Link></li>
                 <li><Link href="/about"><XpIcon name="info" />About myClearance</Link></li>
               </ul>
@@ -102,7 +104,7 @@ export default function HarmReductionPage() {
             <div className="ex-panel">
               <h2>Details</h2>
               <p>
-                The alcohol calculator models how alcohol moves through your body, using published data.
+                The alcohol and MDMA calculators model how each substance moves through your body, using published data.
                 The other substances have information pages while their PK-PD tools are being built.
                 Everything here is educational, not medical advice.
               </p>

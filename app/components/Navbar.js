@@ -8,6 +8,7 @@ const LINKS = [
   { href: '/harm-reduction',              label: 'Substances',   icon: 'chart', exact: true },
   { href: '/harm-reduction/interactions', label: 'Interactions', icon: 'interactions' },
   { href: '/harm-reduction/guide',        label: 'Guide',        icon: 'guide' },
+  { href: '/models',                      label: 'Models',       icon: 'model' },
   { href: '/sources',                     label: 'Sources',      icon: 'folder' },
   { href: '/about',                       label: 'About',        icon: 'info' },
 ]

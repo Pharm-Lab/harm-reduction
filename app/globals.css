@@ -250,8 +250,10 @@ a.xp-cap:hover { filter: brightness(1.2); }
   border-color: #07050f !important;
   box-shadow: inset 1px 1px 3px rgba(0,0,0,.8), inset 0 -1px 0 rgba(167,139,250,.35) !important;
   color: #fff !important;
-  font-weight: bold;
 }
+/* Bold only once selected. Bold while the mouse is held down made buttons wider
+   mid-click, so a button could wrap away from the cursor and the click got lost. */
+.xp-skin button[aria-pressed="true"], .xp-btn-on { font-weight: bold; }
 .xp-skin button:disabled { opacity: .5; cursor: default; box-shadow: none; }
 
 /* ---------- Dialog-style messages ---------- */

@@ -1,0 +1,12 @@
+USED FOR FITTING
+Cmax 75 mg (ng/mL)                                             124.5             126   Vizeli 2017
+Cmax 125 mg (ng/mL)                                              224             222   Vizeli 2017
+Tmax 125 mg (h)                                                 2.34            2.29   Hysek 2012 (not fitted)
+Half-life 125 mg (h)                                            8.17            7.80   Hysek 2012
+100+100 mg, 4 h apart: vs adding doses                        +23.1%          +18.4%   Farre 2015
+Effect onset / peak / offset (h)                        0.55/1.6/4.8  0.58/1.31/5.46   Vizeli 2017
+
+HELD OUT (not used for fitting)
+50 then 100 mg, 2 h apart: vs adding doses                    +12.8%          +14.2%   Peiro 2013
+Same: Cmax two doses / Cmax 100 mg alone                       1.53x           1.54x   Peiro 2013
+Half-life longer after higher dose?                   yes 6.9 -> 8.1      6.1 -> 7.8   Kolbrich 2008 (1.0 vs 1.6 mg/kg)

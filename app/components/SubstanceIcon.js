@@ -197,6 +197,24 @@ const ICONS = {
     </>
   ),
 
+  model: (id) => (
+    <>
+      <defs>
+        <linearGradient id={`${id}-pk`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#6fb6ff" /><stop offset="1" stopColor="#1f5fb8" /></linearGradient>
+        <linearGradient id={`${id}-pd`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#b9a4ff" /><stop offset="1" stopColor="#5b3fd6" /></linearGradient>
+      </defs>
+      <g filter={`url(#${id}-shadow)`}>
+        <path d="M17 13 H 29 M 12 19 V 27 H 18 M 36 19 V 27 H 30" fill="none" stroke="#c9cde3" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M27 10 L 31 13 L 27 16 Z M 16.5 24 L 19.5 27 L 16.5 30 Z M 31.5 24 L 28.5 27 L 31.5 30 Z" fill="#c9cde3" />
+        <rect x="5" y="7" width="13" height="12" rx="2" fill={`url(#${id}-pk)`} stroke={OUT} strokeWidth="1.5" />
+        <rect x="30" y="7" width="13" height="12" rx="2" fill={`url(#${id}-pk)`} stroke={OUT} strokeWidth="1.5" />
+        <rect x="17.5" y="29" width="13" height="12" rx="2" fill={`url(#${id}-pd)`} stroke={OUT} strokeWidth="1.5" />
+        <path d="M7 9.5 H 16 M 32 9.5 H 41 M 19.5 31.5 H 28.5" stroke="#fff" strokeOpacity=".55" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M20 38 C 22 33 24 33 25 35.5 S 27.5 37 28.5 34" fill="none" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" />
+      </g>
+    </>
+  ),
+
   nl: (id) => (
     <>
       <defs>

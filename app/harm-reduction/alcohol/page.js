@@ -1,11 +1,12 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import Link from 'next/link'
 import Window from '@/app/components/Window'
 import {
   COUNTRIES, BAC_ZONES, DRINK_TYPES, DRINK_VOLUMES,
   simulateBAC, calcBACMetrics, formatHours,
   calcEthanolGrams, KA_FASTING, KA_FED,
-  BETA_MEAN, BETA_LOW, BETA_HIGH, calcWidmarkPeak,
+  BETA_MEAN, BETA_LOW, BETA_HIGH, calcWidmarkPeak, watsonTBW, rFromBody,
 } from '../../../lib/bacmath.js'
 
 const CATEGORIES = ['Beer', 'Wine', 'Spirits', 'Mixed', 'Custom']
@@ -31,11 +32,14 @@ export default function AlcoholCalculator() {
   const [sex,        setSex]        = useState('male')
   const [weightKg,   setWeightKg]   = useState(75)
   const [rawWeight,  setRawWeight]  = useState('75')
+  const [heightCm,   setHeightCm]   = useState(180)
+  const [ageY,       setAgeY]       = useState(25)
   const [country,    setCountry]    = useState('NL')
   const [driverType, setDriverType] = useState('standard')
   const [withFood,   setWithFood]   = useState(false)
   const [drinks,     setDrinks]     = useState([makeDrink()])
-  const [tEnd,       setTEnd]       = useState(24)
+  const [mode,       setMode]       = useState('drinks')   // 'drinks' or 'session'
+  const [session,    setSession]    = useState({ count: 24, intervalMin: 15, typeId: 'lager', category: 'Beer', volumeMl: 330, abv: 5.0 })
   const [timeScale,  setTimeScale]  = useState(12)
   const [bacPts,     setBacPts]     = useState([])
   const [bacPtsLow,  setBacPtsLow]  = useState([])
@@ -49,31 +53,53 @@ export default function AlcoholCalculator() {
   const metRef    = useRef(null)
   const stateRef  = useRef({})
 
-  // Keep stateRef in sync for drawCanvas
-  useEffect(() => {
-    stateRef.current = { timeScale, country, driverType, drinks }
-  }, [timeScale, country, driverType, drinks])
+  // Body water (Watson) gives a personal distribution factor r
+  const body = { sex, ageY, heightCm, weightKg }
+  const tbw  = watsonTBW(body)
+  const r    = rFromBody(body)
 
-  // Recompute BAC whenever inputs change
-  useEffect(() => {
-    if (!drinks.length) { setBacPts([]); setMetrics(null); return }
-
-    const ka = withFood ? KA_FED : KA_FASTING
-
-    const drinkInputs = drinks.flatMap(d => {
+  // One list of { timeh, ethanolG } for both input modes
+  const drinkList = useMemo(() => {
+    if (mode === 'session') {
+      const eg = calcEthanolGrams(session.volumeMl, session.abv / 100)
+      return Array.from({ length: session.count }, (_, i) => ({ timeh: (i * session.intervalMin) / 60, ethanolG: eg }))
+    }
+    return drinks.flatMap(d => {
       const vol = d.typeId === 'custom' ? d.customVolume : d.volumeMl
       const abv = d.typeId === 'custom' ? d.customAbv    : d.abv
       const eg  = calcEthanolGrams(vol, abv / 100)
-      return Array.from({ length: d.qty }, () => ({
-        timeh:    d.timeh,
-        ethanolG: eg,
-        ka,
-      }))
+      return Array.from({ length: d.qty }, () => ({ timeh: d.timeh, ethanolG: eg }))
     })
+  }, [mode, session, drinks])
+
+  const totalEthanol = drinkList.reduce((sum, d) => sum + d.ethanolG, 0)
+  const lastDrinkH   = drinkList.reduce((m, d) => Math.max(m, d.timeh), 0)
+
+  // Simulate long enough for even the slowest eliminator to get back to zero
+  const tEnd = useMemo(() => {
+    const widmark = totalEthanol / (weightKg * r)
+    return Math.min(96, Math.max(24, Math.ceil(lastDrinkH + widmark / BETA_LOW + 2)))
+  }, [totalEthanol, lastDrinkH, weightKg, r])
+
+  // In session mode, zoom the graph out to show the whole session
+  useEffect(() => {
+    if (mode === 'session') setTimeScale(Math.min(tEnd, 48))
+    else setTimeScale(t => Math.min(t, tEnd))
+  }, [mode, tEnd])
+
+  // Keep stateRef in sync for drawCanvas
+  useEffect(() => {
+    stateRef.current = { timeScale, country, driverType, drinks: drinkList }
+  }, [timeScale, country, driverType, drinkList])
+
+  // Recompute BAC whenever inputs change
+  useEffect(() => {
+    const ka = withFood ? KA_FED : KA_FASTING
+    const drinkInputs = drinkList.map(d => ({ ...d, ka }))
 
     if (!drinkInputs.length) { setBacPts([]); setMetrics(null); return }
 
-    const common = { drinks: drinkInputs, weightKg, sex, tEnd: Math.max(tEnd, 24) }
+    const common = { drinks: drinkInputs, weightKg, sex, r, tEnd, nSteps: Math.max(2000, Math.round(tEnd * 100)) }
     const pts    = simulateBAC({ ...common, betaRate: BETA_MEAN })
     const ptsLow = simulateBAC({ ...common, betaRate: BETA_LOW  })
     const ptsHigh= simulateBAC({ ...common, betaRate: BETA_HIGH })
@@ -82,7 +108,7 @@ export default function AlcoholCalculator() {
       ? (COUNTRIES[country][driverType] ?? COUNTRIES[country].standard)
       : null
     const totalEthanolG = drinkInputs.reduce((sum, d) => sum + d.ethanolG, 0)
-    const widmarkPeak   = calcWidmarkPeak(totalEthanolG, weightKg, sex)
+    const widmarkPeak   = calcWidmarkPeak(totalEthanolG, weightKg, sex, r)
     const m             = { ...calcBACMetrics(pts, limit), widmarkPeak: +widmarkPeak.toFixed(3) }
 
     bacRef.current  = pts
@@ -95,7 +121,7 @@ export default function AlcoholCalculator() {
     setBacPtsHigh(ptsHigh)
     setMetrics(m)
     setTimeout(() => { if (canvasRef.current) drawCanvas() }, 0)
-  }, [drinks, sex, weightKg, withFood, country, driverType, tEnd])
+  }, [drinkList, sex, weightKg, r, withFood, country, driverType, tEnd])
 
   useEffect(() => {
     if (bacRef.current.length && canvasRef.current) drawCanvas()
@@ -131,7 +157,7 @@ export default function AlcoholCalculator() {
     ctx.scale(dpr, dpr)
   }
 
-    const pad = { top: 28, right: 24, bottom: 48, left: 52 }
+    const pad = { top: 28, right: 24, bottom: 62, left: 52 }
     const cW  = W - pad.left - pad.right
     const cH  = H - pad.top  - pad.bottom
 
@@ -169,16 +195,19 @@ export default function AlcoholCalculator() {
     // Grid
     ctx.strokeStyle = 'rgba(255,255,255,0.07)'
     ctx.lineWidth = 1
-    const yLines = [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0].filter(v => v <= dispMax)
+    const yStep  = dispMax > 4 ? 1 : 0.5
+    const yLines = Array.from({ length: Math.floor(dispMax / yStep) + 1 }, (_, i) => +(i * yStep).toFixed(1))
     yLines.forEach(v => {
       const y = yS(v)
       ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cW, y); ctx.stroke()
     })
-    const nX = Math.min(ts, 12)
-    for (let i = 0; i <= nX; i++) {
-      const x = pad.left + (i / nX) * cW
+    // Even time steps: the smallest of these that gives at most 12 ticks
+    const xStep  = [1, 2, 3, 4, 6, 8, 12].find(st => ts / st <= 12) ?? 24
+    const xTicks = Array.from({ length: Math.floor(ts / xStep) + 1 }, (_, i) => i * xStep)
+    xTicks.forEach(h => {
+      const x = xS(h)
       ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + cH); ctx.stroke()
-    }
+    })
 
     // Axis labels
     ctx.fillStyle = '#9aa1bf'
@@ -188,9 +217,7 @@ export default function AlcoholCalculator() {
       ctx.fillText(v.toFixed(1) + '‰', pad.left - 4, yS(v) + 4)
     })
     ctx.textAlign = 'center'
-    for (let i = 0; i <= nX; i++) {
-      ctx.fillText((ts * i / nX).toFixed(0) + 'h', pad.left + (i / nX) * cW, pad.top + cH + 18)
-    }
+    xTicks.forEach(h => ctx.fillText(h + 'h', xS(h), pad.top + cH + 18))
     ctx.save()
     ctx.translate(14, pad.top + cH / 2)
     ctx.rotate(-Math.PI / 2)
@@ -198,7 +225,7 @@ export default function AlcoholCalculator() {
     ctx.fillText('BAC (‰ g/L)', 0, 0)
     ctx.restore()
     ctx.textAlign = 'center'
-    ctx.fillText('Time after first drink (h)', pad.left + cW / 2, H - 8)
+    ctx.fillText('Time after first drink (h)', pad.left + cW / 2, H - 6)
     ctx.strokeStyle = '#4a5274'
     ctx.lineWidth = 1
     ctx.strokeRect(pad.left, pad.top, cW, cH)
@@ -292,7 +319,7 @@ export default function AlcoholCalculator() {
       if (t > maxT) return
       ctx.font      = '12px Tahoma, Verdana, sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText('🍺', xS(t), pad.top + cH + 38)
+      ctx.fillText('🍺', xS(t), pad.top + cH + 36)
     })
 
     // Main BAC curve
@@ -356,12 +383,15 @@ export default function AlcoholCalculator() {
 
   const limit        = driverType !== 'none' ? (COUNTRIES[country][driverType] ?? COUNTRIES[country].standard) : null
   const peakZone     = metrics ? BAC_ZONES.slice().reverse().find(z => metrics.peakBAC >= z.min) : null
-  const totalEthanol = drinks.reduce((sum, d) => {
-    const vol = d.typeId === 'custom' ? d.customVolume : d.volumeMl
-    const abv = d.typeId === 'custom' ? d.customAbv    : d.abv
-    return sum + calcEthanolGrams(vol, abv / 100) * d.qty
-  }, 0)
   const totalUnits = totalEthanol / 10
+  const sessionMinutes = mode === 'session' ? (session.count - 1) * session.intervalMin : 0
+  const setS = patch => setSession(prev => ({ ...prev, ...patch }))
+  function pickSessionType(typeId) {
+    const type = DRINK_TYPES.find(t => t.id === typeId)
+    if (!type) return
+    const vols = DRINK_VOLUMES[type.category] ?? DRINK_VOLUMES['Mixed']
+    setS({ typeId, category: type.category, abv: type.defaultAbv, volumeMl: vols?.[1]?.ml ?? vols?.[0]?.ml ?? 330 })
+  }
 
   const btn = active => ({
     padding: '4px 12px', cursor: 'pointer', fontSize: '13.5px', minHeight: '24px',
@@ -378,6 +408,10 @@ export default function AlcoholCalculator() {
         <strong>Never use this to decide whether you can drive.</strong> The model shows averages, and your real BAC can be higher. If you have been drinking, don't drive.
       </div>
 
+      <p style={{ margin: '-0.5rem 0 1.25rem', fontSize: '13px', color: 'var(--xp-text-dim)' }}>
+        Want to check the maths? The <Link href="/models?model=alcohol">Models page</Link> shows every equation, parameter, source and line of code behind this calculator.
+      </p>
+
       <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: '1.5rem' }}>
 
         {/* ── Left column ── */}
@@ -390,8 +424,8 @@ export default function AlcoholCalculator() {
             <div style={{ marginBottom: '10px' }}>
               <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Biological sex</label>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button onClick={() => setSex('male')}   style={btn(sex === 'male')} aria-pressed={Boolean(sex === 'male')}>Male (r = 0.68)</button>
-                <button onClick={() => setSex('female')} style={btn(sex === 'female')} aria-pressed={Boolean(sex === 'female')}>Female (r = 0.55)</button>
+                <button onClick={() => setSex('male')}   style={btn(sex === 'male')} aria-pressed={Boolean(sex === 'male')}>Male</button>
+                <button onClick={() => setSex('female')} style={btn(sex === 'female')} aria-pressed={Boolean(sex === 'female')}>Female</button>
               </div>
             </div>
 
@@ -407,6 +441,37 @@ export default function AlcoholCalculator() {
                   onChange={e => { setWeightKg(parseInt(e.target.value)); setRawWeight(e.target.value) }}
                   style={{ flex: 1, accentColor: '#2fb34a' }} />
               </div>
+            </div>
+
+            <div style={{ marginBottom: '10px' }}>
+              <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Height</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input type="number" value={heightCm} min={140} max={210}
+                  onChange={e => { const n = parseInt(e.target.value); if (n >= 140 && n <= 210) setHeightCm(n) }}
+                  style={{ width: '60px', padding: '4px 8px', fontSize: '15.5px', fontWeight: '600', textAlign: 'right' }} aria-label="Height in cm" />
+                <span style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)' }}>cm</span>
+                <input type="range" min={140} max={210} step={1} value={heightCm}
+                  onChange={e => setHeightCm(parseInt(e.target.value))} style={{ flex: 1 }} aria-label="Height" />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '10px' }}>
+              <label style={{ fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Age</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input type="number" value={ageY} min={18} max={90}
+                  onChange={e => { const n = parseInt(e.target.value); if (n >= 18 && n <= 90) setAgeY(n) }}
+                  style={{ width: '60px', padding: '4px 8px', fontSize: '15.5px', fontWeight: '600', textAlign: 'right' }} aria-label="Age in years" />
+                <span style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)' }}>years</span>
+                <input type="range" min={18} max={90} step={1} value={ageY}
+                  onChange={e => setAgeY(parseInt(e.target.value))} style={{ flex: 1 }} aria-label="Age" />
+              </div>
+            </div>
+
+            <div className="xp-well" style={{ padding: '8px 12px', marginBottom: '12px', fontSize: '13px' }}>
+              Estimated body water: <strong>{tbw.toFixed(1)} L</strong>, giving a distribution factor <strong>r = {r.toFixed(2)}</strong>
+              <span style={{ display: 'block', color: 'var(--xp-text-dim)', fontSize: '12px', marginTop: '2px' }}>
+                Watson formula{sex === 'female' ? ' (for women it uses height and weight only)' : ''}.
+              </span>
             </div>
 
             <div>
@@ -478,6 +543,69 @@ export default function AlcoholCalculator() {
           <div className="xp-group">
             <p className="xp-legend">Drinks</p>
 
+            <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
+              <button onClick={() => setMode('drinks')}  style={btn(mode === 'drinks')}  aria-pressed={mode === 'drinks'}>Drink by drink</button>
+              <button onClick={() => setMode('session')} style={btn(mode === 'session')} aria-pressed={mode === 'session'}>Binge session</button>
+            </div>
+
+            {mode === 'session' && (
+              <div>
+                <p style={{ margin: '0 0 10px', fontSize: '13px', color: 'var(--xp-text-dim)' }}>
+                  Same drink, steady pace. For a long session like kratzitten (a full crate of 24 beers in one go).
+                </p>
+                <button onClick={() => setSession({ count: 24, intervalMin: 15, typeId: 'lager', category: 'Beer', volumeMl: 330, abv: 5.0 })}
+                  style={{ padding: '4px 10px', fontSize: '13px', marginBottom: '12px' }}>
+                  Krat preset: 24 &times; 330 ml at 5%, every 15 min
+                </button>
+
+                <label style={{ fontSize: '13.5px', display: 'block', marginBottom: '4px' }}>Number of drinks</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                  <input type="number" min={1} max={48} value={session.count}
+                    onChange={e => { const n = parseInt(e.target.value); if (n >= 1 && n <= 48) setS({ count: n }) }}
+                    style={{ width: '60px', padding: '4px 8px', textAlign: 'right', fontSize: '15.5px', fontWeight: '600' }} />
+                  <input type="range" min={1} max={48} step={1} value={session.count}
+                    onChange={e => setS({ count: parseInt(e.target.value) })} style={{ flex: 1 }} aria-label="Number of drinks" />
+                </div>
+
+                <label style={{ fontSize: '13.5px', display: 'block', marginBottom: '4px' }}>Minutes between drinks (average)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                  <input type="number" min={1} max={120} value={session.intervalMin}
+                    onChange={e => { const n = parseInt(e.target.value); if (n >= 1 && n <= 120) setS({ intervalMin: n }) }}
+                    style={{ width: '60px', padding: '4px 8px', textAlign: 'right', fontSize: '15.5px', fontWeight: '600' }} />
+                  <span style={{ fontSize: '13.5px', color: 'var(--xp-text-dim)' }}>min</span>
+                  <input type="range" min={1} max={120} step={1} value={session.intervalMin}
+                    onChange={e => setS({ intervalMin: parseInt(e.target.value) })} style={{ flex: 1 }} aria-label="Minutes between drinks" />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginBottom: '6px' }}>
+                  <div>
+                    <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>Drink</label>
+                    <select value={session.typeId} onChange={e => pickSessionType(e.target.value)} style={{ width: '100%', padding: '6px 8px', fontSize: '13.5px' }}>
+                      {CATEGORIES.filter(c => c !== 'Custom').map(cat => (
+                        <optgroup key={cat} label={cat}>
+                          {DRINK_TYPES.filter(t => t.category === cat).map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>Size</label>
+                    <select value={session.volumeMl} onChange={e => setS({ volumeMl: parseInt(e.target.value) })} style={{ width: '100%', padding: '6px 8px', fontSize: '13.5px' }}>
+                      {(DRINK_VOLUMES[session.category] ?? DRINK_VOLUMES['Mixed']).map(v => <option key={v.label} value={v.ml}>{v.label}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <label style={{ fontSize: '12.5px', color: 'var(--xp-text-dim)', display: 'block', marginBottom: '3px' }}>Alcohol: {session.abv.toFixed(1)}%</label>
+                <input type="range" min={0.5} max={70} step={0.5} value={session.abv}
+                  onChange={e => setS({ abv: parseFloat(e.target.value) })} style={{ width: '100%' }} aria-label="Alcohol percentage" />
+
+                <div className="xp-well" style={{ marginTop: '10px', padding: '8px 12px', fontSize: '13.5px' }}>
+                  {session.count} drinks over <strong>{formatHours(sessionMinutes / 60)}</strong>, starting at 0h.
+                </div>
+              </div>
+            )}
+
+            {mode === 'drinks' && <>
             {drinks.map((d, idx) => {
               const volumes  = DRINK_VOLUMES[d.category] ?? DRINK_VOLUMES['Mixed']
               const isCustom = d.typeId === 'custom'
@@ -578,6 +706,7 @@ export default function AlcoholCalculator() {
               style={{ width: '100%', padding: '8px', fontSize: '14.5px', cursor: 'pointer' }}>
               + Add another drink
             </button>
+            </>}
 
             <div className="xp-group" style={{ marginTop: '10px', fontSize: '13.5px', color: 'rgba(240,244,255,0.75)', padding: '12px 14px' }}>
               Total: <strong>{totalEthanol.toFixed(1)} g alcohol</strong>, which is <strong>{totalUnits.toFixed(1)}</strong> Dutch standard drinks (10 g each)
@@ -597,7 +726,7 @@ export default function AlcoholCalculator() {
           {/* Graph controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13.5px' }}>
             <span style={{ fontSize: '12.5px', fontWeight: '500', color: 'var(--xp-text-dim)', whiteSpace: 'nowrap' }}>Show</span>
-            <input type="range" min={4} max={24} step={1} value={timeScale}
+            <input type="range" min={4} max={tEnd} step={1} value={timeScale}
               onChange={e => setTimeScale(parseInt(e.target.value))}
               style={{ flex: 1, accentColor: '#2fb34a' }} />
             <span style={{ fontWeight: '600', color: 'rgba(240,244,255,0.75)', minWidth: '28px' }}>{timeScale}h</span>
@@ -614,6 +743,12 @@ export default function AlcoholCalculator() {
                 {z.max === 10 ? `${z.min.toFixed(1)}‰ and up` : `${z.min.toFixed(1)} to ${z.max.toFixed(1)}‰`}: {z.label}
               </span>
             ))}
+          </div>
+
+          {/* What the line and band mean */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 18px', fontSize: '12.5px', color: 'var(--xp-text-dim)' }}>
+            <span><span aria-hidden="true" style={{ display: 'inline-block', width: '18px', height: '3px', background: '#2563eb', verticalAlign: 'middle', marginRight: '6px' }} />Typical person: clears 0.15&permil; per hour</span>
+            <span><span aria-hidden="true" style={{ display: 'inline-block', width: '18px', height: '10px', background: 'rgba(37,99,235,0.3)', verticalAlign: 'middle', marginRight: '6px' }} />Shaded: fast clearers (0.25&permil;/h) at the bottom to slow clearers (0.10&permil;/h) at the top. Over many drinks this gap keeps growing.</span>
           </div>
 
           {/* Metrics */}
@@ -661,6 +796,18 @@ export default function AlcoholCalculator() {
                   {m.sub && <div style={{ fontSize: '11.5px', color: m.color ?? 'rgba(240,244,255,0.35)' }}>{m.sub}</div>}
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Dangerous level warnings */}
+          {metrics && metrics.peakBAC >= 3 && (
+            <div className="xp-alert xp-alert-error" style={{ fontSize: '13.5px' }}>
+              <strong>This level can kill.</strong> A peak above 3&permil; means numbed senses and confusion, and above 4&permil; breathing and pulse can slow until coma. In real life vomiting often removes some alcohol, so peaks can end up lower than modelled, but a session like this is exactly how people end up in hospital or worse. Never let someone who is this drunk sleep it off alone. If they cannot be woken or breathe slowly, call 112.
+            </div>
+          )}
+          {metrics && metrics.peakBAC >= 1.5 && metrics.peakBAC < 3 && mode === 'session' && (
+            <div className="xp-alert xp-alert-warn" style={{ fontSize: '13.5px' }}>
+              <strong>Very drunk territory.</strong> Above 1.5&permil; most people feel sick, vomit and lose judgement. Spreading the same drinks over more time lowers the peak, because your liver keeps clearing alcohol during the session. Drinking fewer lowers it most. Try both with the sliders.
             </div>
           )}
 
@@ -717,16 +864,21 @@ export default function AlcoholCalculator() {
           <section className="xp-group edu">
             <h3 className="xp-legend" style={{ fontWeight: 'bold' }}>2. Distribution: why weight and sex matter</h3>
             <p>
-              Alcohol spreads through the water in your body. The Widmark factor <em>r</em> describes how much of your body
-              weight takes part in that. On average it is about 0.68 for men and 0.55 for women.
+              Alcohol spreads through the water in your body, so less body water means a higher concentration from the
+              same drinks. That is why women, older people and people with more body fat usually reach a higher BAC.
             </p>
             <p>
-              Less body water means the same alcohol ends up more concentrated. That is why women, people with more body fat
-              and older people usually reach a higher BAC from the same drinks, and why a lighter body weight gives a higher curve.
+              The Widmark factor <em>r</em> captures this. The calculator works out your body water from sex, age, height and
+              weight (the Watson formula). Blood is about 80% water, so r = body water &divide; (0.8 &times; body weight).
             </p>
             <div className="calc xp-well">
-              Widmark peak = grams of alcohol &divide; (body weight in kg &times; <em>r</em>)<br />
-              Example: 3 standard drinks (30 g), 70 kg man: 30 &divide; (70 &times; 0.68) &asymp; 0.63&permil;
+              Body water, men: 2.447 &minus; 0.09516 &times; age + 0.1074 &times; height + 0.3362 &times; weight<br />
+              Body water, women: &minus;2.097 + 0.1069 &times; height + 0.2466 &times; weight<br />
+              Peak BAC = grams of alcohol &divide; (weight &times; r)<br />
+              <span style={{ color: 'var(--xp-text-dim)' }}>
+                Example: man, 25, 180 cm, 75 kg: 44.6 L body water, r &asymp; 0.74.
+                Three standard drinks (30 g): 30 &divide; (75 &times; 0.74) &asymp; 0.54&permil;
+              </span>
             </div>
           </section>
 

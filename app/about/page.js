@@ -1,53 +1,28 @@
-import Link from 'next/link'
 import Window from '@/app/components/Window'
 
 const sections = [
   {
-    title: 'Who I am',
+    title: 'Who made this',
     paras: [
-      "I'm doing a master's in Biopharmaceutical Sciences at Leiden, after doing my bachelor's in Bio-Farmaceutische Wetenschappen (BFW) there too. Four years of pharmacokinetics, drug metabolism and pharmacology, and I didn't want any of it to go to waste.",
-      "When I'm not doing this, I'm probably setting up the nth modded Minecraft server for my friends, producing hard electronic music, or letting it all go at a rave. I nerd out. Pharmacokinetics and raves are closer together than they sound, and that overlap is exactly where this site came from.",
-      "In my friend group, mostly pharmacy and bioscience students, we have literally modelled our own pharmacology. Because we could, and because it's useful. At some point it seemed strange that this kind of knowledge only lives in university courses and textbooks.",
+      "I'm a master's student in Biopharmaceutical Sciences at Leiden, with a bachelor's in BFW from the same university. I also go out, and I noticed how little of what we learn about drugs in class reaches the people actually taking them.",
     ],
   },
   {
-    title: 'Why harm reduction',
+    title: 'Why',
     paras: [
-      "Accurate information reduces harm better than scare tactics. That's not a hot take. It's the foundation of harm reduction as a public health field.",
-      "There are plenty of good harm reduction sites, and most do genuinely useful work. What I hadn't seen was one that starts from pharmacokinetics: real models, real parameters, here is what your body does and when. People who go out deserve to understand the pharmacology of what they take, without needing a degree first.",
-      "myClearance doesn't tell you to use or not to use. It tells you what happens in your body, so the choices you make are informed ones.",
+      "Accurate information reduces harm better than scare tactics. myClearance shows what a substance does in your body and when, based on published pharmacokinetics. It doesn't tell you whether to use. It helps you understand what happens if you do.",
     ],
   },
   {
-    title: 'What is on the site',
+    title: 'How it works',
     paras: [
-      "The alcohol calculator is the first complete PK-PD tool. It models how your blood alcohol rises and falls over a night, shows what each level does to you, and explains every step underneath.",
-      "The other substances have information pages for now: what is actually being sold, the biggest risks, and the combinations to avoid. Interactive PK-PD tools for them are coming, but only once each one is as solid as the alcohol calculator.",
-      "There is also an interaction checker for combinations, and a guide that explains how to read the graphs.",
+      "No accounts, no tracking, no ads. The calculator runs in your browser and nothing you enter leaves your device. Every claim links to a source on the Sources page.",
     ],
   },
   {
-    title: 'How it stays honest',
+    title: 'Made with Claude',
     paras: [
-      "No accounts, no tracking, no ads. The calculator runs entirely in your browser. Nothing you enter is stored or sent anywhere.",
-      "Every claim on the site comes from a source you can check. The Sources page lists each one, what information came from it and how it is used, with the date it was last checked.",
-      "The calculations are fixed formulas from published pharmacokinetics. No AI is involved when you use the site.",
-    ],
-  },
-  {
-    title: 'On using Claude',
-    paras: [
-      "I used Claude, an AI assistant, throughout development. It made building faster and got me to something polished without months of grinding solo. The site in its current form wouldn't exist without it.",
-      "The thinking is mine though. The parameters, the framing, what to build and why: that came from four years of courses and actually caring about this. Claude wrote a lot of the code and helped research and check sources. I decided what the site should do and say.",
-      "I'd rather be upfront about that than pretend otherwise.",
-    ],
-  },
-  {
-    title: 'What this is not',
-    paras: [
-      "This is not medical advice and not dosing advice. The models use population averages, and your body can differ.",
-      "myClearance is an independent student project. It is not affiliated with Leiden University or any other institution.",
-      "If you are worried about your own use or someone else's, Jellinek, Trimbos and Drugsinfo.nl offer free and confidential help. In an emergency, call 112.",
+      "I used Claude, an AI assistant, to write much of the code and to research and check sources. The choices about what to build and what to say are mine. When you use the site, no AI is involved: the calculations are fixed formulas.",
     ],
   },
 ]
@@ -91,7 +66,7 @@ export default function AboutPage() {
           </svg>
           <div>
             <h1><span className="my">my</span>Clearance</h1>
-            <p>A student project that got out of hand. Built between lectures, practicals and parties.</p>
+            <p>Pharmacokinetics for a night out.</p>
           </div>
         </div>
 
@@ -105,9 +80,8 @@ export default function AboutPage() {
         </div>
 
         <div className="xp-alert xp-alert-info" style={{ marginTop: '18px' }}>
-          Start with the <Link href="/harm-reduction/alcohol">alcohol calculator</Link>, browse
-          the <Link href="/harm-reduction">substance pages</Link>, or check
-          the <Link href="/sources">sources</Link> behind everything.
+          Not medical or dosing advice. An independent student project, not affiliated with Leiden University.
+          Worried about your own use or someone else&apos;s? <a href="https://www.jellinek.nl" target="_blank" rel="noopener noreferrer">Jellinek</a> and <a href="https://www.drugsinfo.nl" target="_blank" rel="noopener noreferrer">Drugsinfo.nl</a> can help. In an emergency, call 112.
         </div>
       </Window>
     </main>
